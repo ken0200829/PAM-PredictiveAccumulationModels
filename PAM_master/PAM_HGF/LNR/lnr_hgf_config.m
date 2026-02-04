@@ -1,39 +1,50 @@
 function c = lnr_hgf_config
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Configuration for LNR response model with HGF perceptual model
 %
-% Contains the configuration for the Linear Deterministic Accumulator (LNR) according to:
-% Heathcote, A., & Love, J. (2012). Linear Deterministic Accumulator Models of Simple Choice. Frontiers in Psychology, 3.
-
+% OUTPUT:
+%   c - Configuration structure with priors and model specifications
 %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% The structure and methodologies of this file are inspired
-% from the HGF Toolbox, open source code available as part of the TAPAS
-% software collection: Frässle, S., et al. (2021). TAPAS: An Open-Source Software Package 
-% for Translational Neuromodeling and Computational Psychiatry. Frontiers in Psychiatry, 12:680811. 
+% PRIORS:
+% All priors are Gaussian in the space where the quantity is estimated. They are specified by
+% mean and variance (NOT standard deviation). Parameters can be fixed by setting prior variance to 0.
+%
+% PARAMETERS:
+%   a      - Intercept of lognormal mean
+%   b_val  - Slope of validity effect (stimulus-response match)
+%   b      - Slope of prior belief effect on lognormal mean
+%   sigma  - Standard deviation of lognormal distribution
+%   Ter    - Non-decision time (default: not estimated, Termu = -Inf, Tersa = 0)
+%
+% PERCEPTUAL MODEL:
+% Hierarchical Gaussian Filter for binary inputs introduced in
+% Mathys C, Daunizeau J, Friston, KJ, and Stephan KE. (2011). A Bayesian foundation
+% for individual learning under uncertainty. Frontiers in Human Neuroscience, 5:39.
+% https://doi.org/10.3389/fnhum.2011.00039
+%
+% RESPONSE MODEL:
+% Lognormal Race Model (LNR) introduced in Rouder JN, Province JM, Morey RD, Gomez P,
+% Heathcote A (2015). The lognormal race: A cognitive-process model of choice and latency
+% with desirable psychometric properties. Psychometrika, 80(2), 491-513.
+% https://doi.org/10.1007/s11336-013-9396-3
+%
+% See also: Heathcote A, Love J (2012). Linear deterministic accumulator models of simple choice.
+% Frontiers in Psychology, 3:292. https://doi.org/10.3389/fpsyg.2012.00292
+%
+% The structure and methodologies of this file are adapted from the HGF Toolbox,
+% part of the TAPAS software collection: Frässle et al. (2021). TAPAS: An Open-Source
+% Software Package for Translational Neuromodeling and Computational Psychiatry.
+% Frontiers in Psychiatry, 12:680811. https://doi.org/10.3389/fpsyt.2021.680811
 % https://www.translationalneuromodeling.org/tapas
-% 
-
-% The LNR configuration consists of the priors of parameters and initial values. All priors are
-% Gaussian in the space where the quantity they refer to is estimated. They are specified by their
-% sufficient statistics: mean and variance (NOT standard deviation).
-
-% The default values for all parameters, except non-decision time (Ter), 
-% are pre-defined with the mean set to "0" and the standard deviation set to "4".
-
-% The default values of the parameter "Ter" are set to "-Inf" for the mean
-% and "0" for the standard deviation. With this combination of parameters
-% the value of "Ter" is not estimated. It is possible to estimate "Ter"
-% parameter by changing the values of the aforementioned parameters.
-
-% It is possible to modify the specified values and assign custom values to each parameter.
-
-% This config file does not take any input and returns the
-% structure "c" as output. "c" contains all the necessary values to 
-% define and build a Linear Deterministic Model.
 %
 % --------------------------------------------------------------------------------------------------
-
+% Copyright (C) 2024 Antonino Visalli
+%
+% This file is part of the PAM toolbox, which is released under the terms of the GNU General Public
+% Licence (GPL), version 3. You can redistribute it and/or modify it under the terms of the GPL
+% (either version 3 or, at your option, any later version). For further details, see the file
+% COPYING or <http://www.gnu.org/licenses/>.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Config structure
 c = struct;
@@ -41,11 +52,11 @@ c = struct;
 % Model name
 c.model = 'lnr: hgf';
 
-% intercept of lognormal mu (resp == input)
+% Intercept of lognormal mu (resp == input)
 c.amu = 0;
 c.asa = 4;
 
-% beta for validity (resp = input)
+% Beta for validity (resp = input)
 c.b_valmu = 0;
 c.b_valsa = 4;
 
