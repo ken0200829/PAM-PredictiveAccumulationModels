@@ -1,50 +1,53 @@
 function c = RDM_hgf_config
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Configuration for RDM response model with HGF perceptual model
 %
-% Contains the configuration for the Racing Diffusion Model according to:
-% Tillman, G., Van Zandt, T., & Logan, G. D. (2020). Sequential sampling models without random between-trial variability: the racing diffusion model of speeded decision making. 
-% Psychonomic Bulletin & Review, 27(5), 911–936
-% 
+% OUTPUT:
+%   c - Configuration structure with priors and model specifications
 %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% The structure and methodologies of this file are inspired
-% from the HGF Toolbox, open source code available as part of the TAPAS
-% software collection: Frässle, S., et al. (2021). TAPAS: An Open-Source Software Package 
-% for Translational Neuromodeling and Computational Psychiatry. Frontiers in Psychiatry, 12:680811. 
+% PRIORS:
+% All priors are Gaussian in the space where the quantity is estimated. They are specified by 
+% mean and variance (NOT standard deviation). Parameters can be fixed by setting prior variance to 0.
+%
+% PARAMETERS:
+%   a_a    - Intercept of decision threshold
+%   b_a    - Slope of prior belief effect on decision threshold
+%   a_v    - Intercept of drift rate
+%   b_val  - Slope of validity effect (stimulus-response match) on drift rate
+%   b_v    - Slope of prior belief effect on drift rate
+%   Ter    - Non-decision time (default: not estimated, Termu = -Inf, Tersa = 0)
+%
+% PERCEPTUAL MODEL:
+% Hierarchical Gaussian Filter for binary inputs introduced in
+% Mathys C, Daunizeau J, Friston, KJ, and Stephan KE. (2011). A Bayesian foundation
+% for individual learning under uncertainty. Frontiers in Human Neuroscience, 5:39.
+% https://doi.org/10.3389/fnhum.2011.00039
+%
+% RESPONSE MODEL:
+% Racing Diffusion Model (RDM) introduced in Tillman G, Van Zandt T, Logan GD (2020). 
+% Sequential sampling models without random between-trial variability: The racing diffusion 
+% model of speeded decision making. Psychonomic Bulletin & Review, 27(5), 911-936.
+% https://doi.org/10.3758/s13423-020-01719-6
+%
+% The structure and methodologies of this file are adapted from the HGF Toolbox,
+% part of the TAPAS software collection: Frässle et al. (2021). TAPAS: An Open-Source 
+% Software Package for Translational Neuromodeling and Computational Psychiatry. 
+% Frontiers in Psychiatry, 12:680811. https://doi.org/10.3389/fpsyt.2021.680811
 % https://www.translationalneuromodeling.org/tapas
-% 
-
-
-
-
-% The RDM configuration consists of the priors of parameters and initial values. All priors are
-% Gaussian in the space where the quantity they refer to is estimated. They are specified by their
-% sufficient statistics: mean and variance (NOT standard deviation).
-
-% The default values for all parameters, except non-decision time (Ter), 
-% are pre-defined with the mean set to "0" and the standard deviation set to "4".
-
-% The default values of the parameter "Ter" are set to "-Inf" for the mean
-% and "0" for the standard deviation. With this combination of parameters
-% the value of "Ter" is not estimated. It is possible to estimate "Ter"
-% parameter by changing the values of the aforementioned parameters.
-
-% It is possible to modify the specified values and assign custom values to each parameter.
-
-
-% This config file does not take any input and returns the
-% structure "c" as output. "c" contains all the necessary values to 
-% define and build a Racing Diffusion Model.
 %
 % --------------------------------------------------------------------------------------------------
-% 
-
+% Copyright (C) 2024 Antonino Visalli
+%
+% This file is part of the PAM toolbox, which is released under the terms of the GNU General Public
+% Licence (GPL), version 3. You can redistribute it and/or modify it under the terms of the GPL
+% (either version 3 or, at your option, any later version). For further details, see the file
+% COPYING or <http://www.gnu.org/licenses/>.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Config structure
 c = struct;
 
-% Model's name
+% Model name
 c.model = 'racing diffusion model: hgf';
 
 % Intercept of decision threshold "a"

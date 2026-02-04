@@ -1,20 +1,31 @@
 function [pvec, pstruct] = RDM_hgf_transp(r, ptrans)
-% --------------------------------------------------------------------------------------------------
-
-% RDM_hgf_transp: Function to perform transformation of parameters
-
-% [Inputs]
-% - r: array of responses
-% - ptrans: structure that contains the parameters
-
-
-% The structure and methodologies of this file are inspired
-% from the HGF Toolbox, open source code available as part of the TAPAS
-% software collection: Frässle, S., et al. (2021). TAPAS: An Open-Source Software Package
-% for Translational Neuromodeling and Computational Psychiatry. Frontiers in Psychiatry, 12:680811.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Transforms decision model parameters to their native space
+%
+% INPUTS:
+%   r      - Response structure
+%   ptrans - Parameter vector in transformed space
+%
+% OUTPUTS:
+%   pvec    - Parameter vector in native space
+%   pstruct - Parameter structure in native space
+%
+% The structure and methodologies of this file are adapted from the HGF Toolbox,
+% part of the TAPAS software collection: Frässle et al. (2021). TAPAS: An Open-Source 
+% Software Package for Translational Neuromodeling and Computational Psychiatry. 
+% Frontiers in Psychiatry, 12:680811. https://doi.org/10.3389/fpsyt.2021.680811
 % https://www.translationalneuromodeling.org/tapas
+%
+% --------------------------------------------------------------------------------------------------
+% Copyright (C) 2024 Antonino Visalli
+%
+% This file is part of the PAM toolbox, which is released under the terms of the GNU General Public
+% Licence (GPL), version 3. You can redistribute it and/or modify it under the terms of the GPL
+% (either version 3 or, at your option, any later version). For further details, see the file
+% COPYING or <http://www.gnu.org/licenses/>.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% extracting times
+% Extract response times
 try
 y = r.y(:,1);
 y(r.irr) = [];
