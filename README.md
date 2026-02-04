@@ -13,6 +13,8 @@ Psychiatry, 12:680811. https://doi.org/10.3389/fpsyt.2021.680811
 
 PAM - https://arxiv.org/abs/2411.13203
 
+For a more comprehensive tutorial, visit https://osf.io/3jve9.
+
 The repository is structured in the following way:
 
 ```
