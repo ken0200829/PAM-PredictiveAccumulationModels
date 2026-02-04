@@ -1,34 +1,48 @@
 function c = ddm_hgf_config
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Configuration for DDM response model with HGF perceptual model
 %
-% Contains the configuration for First passage time for Wiener diffusion model (DDM) according to:
-% by Gondan, Blurton, and Kesselmeier (2014)
-% https://doi.org/10.1016/j.jmp.2014.05.002.
-% 
+% OUTPUT:
+%   c - Configuration structure with priors and model specifications
 %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% The structure and methodologies of this file are inspired
-% from the HGF Toolbox, open source code available as part of the TAPAS
-% software collection: Frässle, S., et al. (2021). TAPAS: An Open-Source Software Package 
-% for Translational Neuromodeling and Computational Psychiatry. Frontiers in Psychiatry, 12:680811. 
+% PRIORS:
+% All priors are Gaussian in the space where the quantity is estimated. They are specified by 
+% mean and variance (NOT standard deviation). Parameters can be fixed by setting prior variance to 0.
+%
+% PARAMETERS:
+%   a_a   - Intercept of boundary separation
+%   a_v   - Intercept of drift rate  
+%   b_w   - Slope of prior belief effect on starting point
+%   b_a   - Slope of precision effect on boundary separation
+%   b_v   - Slope of prior belief effect on drift rate
+%   Ter   - Non-decision time
+%
+% PERCEPTUAL MODEL:
+% Hierarchical Gaussian Filter for binary inputs introduced in
+% Mathys C, Daunizeau J, Friston, KJ, and Stephan KE. (2011). A Bayesian foundation
+% for individual learning under uncertainty. Frontiers in Human Neuroscience, 5:39.
+% https://doi.org/10.3389/fnhum.2011.00039
+%
+% RESPONSE MODEL:
+% Wiener first-passage time (WFPT) densities computed using the method from
+% Gondan M, Blurton S, Kesselmeier M (2014). Even faster and even more accurate 
+% first-passage time densities and distributions for the Wiener diffusion model.
+% J. Math. Psychol., 60, 20-22. https://doi.org/10.1016/j.jmp.2014.05.002
+%
+% The structure and methodologies of this file are adapted from the HGF Toolbox,
+% part of the TAPAS software collection: Frässle et al. (2021). TAPAS: An Open-Source 
+% Software Package for Translational Neuromodeling and Computational Psychiatry. 
+% Frontiers in Psychiatry, 12:680811. https://doi.org/10.3389/fpsyt.2021.680811
 % https://www.translationalneuromodeling.org/tapas
-
-
-
-% The DDM configuration consists of the priors of parameters and initial values. All priors are
-% Gaussian in the space where the quantity they refer to is estimated. They are specified by their
-% sufficient statistics: mean and variance (NOT standard deviation).
-
-% The default values for all parameters are pre-defined with the mean set to "0" and the standard deviation set to "4".
-
-% It is possible to modify the specified values and assign custom values to each parameter.
-% This config file does not take any input and returns the
-% structure "c" as output. "c" contains all the necessary values to 
-% define and build a Wiener Diffusion Model.
 %
 % --------------------------------------------------------------------------------------------------
-% 
+% Copyright (C) 2024 Antonino Visalli
+%
+% This file is part of the PAM toolbox, which is released under the terms of the GNU General Public
+% Licence (GPL), version 3. You can redistribute it and/or modify it under the terms of the GPL
+% (either version 3 or, at your option, any later version). For further details, see the file
+% COPYING or <http://www.gnu.org/licenses/>.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Config structure
 c = struct;
