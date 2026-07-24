@@ -1,0 +1,7 @@
+/.claude
+/Results
+*.zip
+matlab_*
+tmp
+analysis/pam_dot_task_python/recovery_runs/*
+analysis/hgf_ddm/recovery_runs

@@ -1,0 +1,13 @@
+\contentsline {section}{\numberline {1}全体状況}{1}{section.1}%
+\contentsline {paragraph}{凍結の原則}{1}{section*.2}%
+\contentsline {section}{\numberline {2}本セッションで完了した作業}{1}{section.2}%
+\contentsline {section}{\numberline {3}主要な所見}{2}{section.3}%
+\contentsline {subsection}{\numberline {3.1}ベイズ最適事前平均の欠落と誤設定}{2}{subsection.3.1}%
+\contentsline {paragraph}{含意}{2}{section*.3}%
+\contentsline {subsection}{\numberline {3.2}\texttt {omega\_2} の実用的識別可能性}{3}{subsection.3.2}%
+\contentsline {paragraph}{解釈}{3}{section*.4}%
+\contentsline {subsection}{\numberline {3.3}tie 試行の扱いの修正}{3}{subsection.3.3}%
+\contentsline {section}{\numberline {4}実行中の作業}{4}{section.4}%
+\contentsline {section}{\numberline {5}未決の科学的判断}{4}{section.5}%
+\contentsline {section}{\numberline {6}残りの検証ゲート}{4}{section.6}%
+\contentsline {section}{\numberline {7}閾値の根拠（補遺）}{4}{section.7}%

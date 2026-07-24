@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-07-20",
+  "pam": {
+    "repository": "https://github.com/antovis86/PAM-PredictiveAccumulationModels.git",
+    "commit": "ce8be02b45edf0a0a4e52d4298fbfefb5c5b6294",
+    "tree": "d2b6aa735bc69bd198bef3ab523c4383aed71cdf"
+  },
+  "tapas": {
+    "repository": "https://github.com/translationalneuromodeling/tapas.git",
+    "version": "6.1.0",
+    "commit": "7155f99137c5e03f93a2a3afa6a8cb54c75dd4c2",
+    "tree": "c46cd4623f1a7d5560e7aee4e7296a517b7abb0f",
+    "install_path": "analysis/pam_dot_task/external/tapas"
+  },
+  "spm": {
+    "repository": "https://github.com/spm/spm12.git",
+    "version": "SPM12 r7771",
+    "tag": "r7771",
+    "commit": "3085dac00ac804adb190a7e82c6ef11866c8af02",
+    "tree": "e82f141d6b940b4cce3c2bbec47133a80b19c889",
+    "install_path": "analysis/pam_dot_task/external/spm12"
+  },
+  "matlab": {
+    "required": true,
+    "minimum_scope": "core MATLAB; Statistics and Machine Learning Toolbox optional",
+    "installation": "user-managed MathWorks licensed installation"
+  }
+}

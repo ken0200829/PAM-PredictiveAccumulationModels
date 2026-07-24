@@ -1,0 +1,798 @@
+{
+  "prior_parameter": "omega_2",
+  "prior_index": 12,
+  "default_prior_mean": -3.0,
+  "prior_variance": 2.0,
+  "subjects": 37,
+  "successful": 37,
+  "summary": {
+    "shared_mean": -4.43966352907523,
+    "shared_sd": 0.5698789146490161,
+    "shared_min": -5.459215899428869,
+    "shared_max": -3.1519275375399864,
+    "cue_gap_mean": -2.409043059825121,
+    "cue_gap_sd": 0.49706653047579935,
+    "cue_gap_min": -3.794419029018227,
+    "cue_gap_max": -1.262329617842822,
+    "subjects_with_white_below_red": 37
+  },
+  "records": [
+    {
+      "subject_id": "normal_cb_dot_task_20260525_233604_69f3b4933e289bad0a2a86e0",
+      "status": "ok",
+      "condition": "normal_cb",
+      "omega_2_shared": -4.765983384743159,
+      "omega_2_white": -5.173726137782314,
+      "omega_2_red": -2.795489340631233,
+      "cue_gap": -2.378236797151081,
+      "input_log_likelihood_shared": -261.8634942435558,
+      "convergence": {
+        "both_cues": "gradient_tolerance",
+        "white": "gradient_tolerance",
+        "red": "gradient_tolerance"
+      },
+      "iterations": {
+        "both_cues": 3,
+        "white": 3,
+        "red": 2
+      },
+      "seconds": 1.5641582012176514
+    },
+    {
+      "subject_id": "normal_cb_dot_task_20260525_234054_699fa8f47f909fa0b31af64b",
+      "status": "ok",
+      "condition": "normal_cb",
+      "omega_2_shared": -3.920151393439598,
+      "omega_2_white": -4.917417245539306,
+      "omega_2_red": -2.464559280311017,
+      "cue_gap": -2.4528579652282887,
+      "input_log_likelihood_shared": -262.5092113990233,
+      "convergence": {
+        "both_cues": "gradient_tolerance",
+        "white": "gradient_tolerance",
+        "red": "gradient_tolerance"
+      },
+      "iterations": {
+        "both_cues": 2,
+        "white": 4,
+        "red": 3
+      },
+      "seconds": 1.5739409923553467
+    },
+    {
+      "subject_id": "normal_cb_dot_task_20260526_003810_698e0c45e7907168d29d5b02",
+      "status": "ok",
+      "condition": "normal_cb",
+      "omega_2_shared": -4.477959472344873,
+      "omega_2_white": -5.259209440530932,
+      "omega_2_red": -3.108278674284277,
+      "cue_gap": -2.150930766246655,
+      "input_log_likelihood_shared": -261.0387444919761,
+      "convergence": {
+        "both_cues": "gradient_tolerance",
+        "white": "gradient_tolerance",
+        "red": "gradient_tolerance"
+      },
+      "iterations": {
+        "both_cues": 3,
+        "white": 4,
+        "red": 2
+      },
+      "seconds": 1.6951329708099365
+    },
+    {
+      "subject_id": "normal_cb_dot_task_20260526_013329_6717f0ac88d9f27d9b79af31",
+      "status": "ok",
+      "condition": "normal_cb",
+      "omega_2_shared": -4.172193387514755,
+      "omega_2_white": -5.204380662043082,
+      "omega_2_red": -2.6533255910240388,
+      "cue_gap": -2.5510550710190434,
+      "input_log_likelihood_shared": -262.371021084594,
+      "convergence": {
+        "both_cues": "gradient_tolerance",
+        "white": "gradient_tolerance",
+        "red": "gradient_tolerance"
+      },
+      "iterations": {
+        "both_cues": 3,
+        "white": 4,
+        "red": 3
+      },
+      "seconds": 1.6752269268035889
+    },
+    {
+      "subject_id": "normal_cb_dot_task_20260526_013913_69d347d637dced9830c3f9c5",
+      "status": "ok",
+      "condition": "normal_cb",
+      "omega_2_shared": -4.503488047954543,
+      "omega_2_white": -5.287664462996616,
+      "omega_2_red": -3.0429439406480716,
+      "cue_gap": -2.244720522348544,
+      "input_log_likelihood_shared": -259.43679524420946,
+      "convergence": {
+        "both_cues": "gradient_tolerance",
+        "white": "gradient_tolerance",
+        "red": "gradient_tolerance"
+      },
+      "iterations": {
+        "both_cues": 3,
+        "white": 4,
+        "red": 1
+      },
+      "seconds": 1.5036721229553223
+    },
+    {
+      "subject_id": "normal_cb_dot_task_20260526_063649_69f07f6580fd9802b7d81fc5",
+      "status": "ok",
+      "condition": "normal_cb",
+      "omega_2_shared": -4.659311480895822,
+      "omega_2_white": -5.12437581162457,
+      "omega_2_red": -2.913247458418749,
+      "cue_gap": -2.211128353205821,
+      "input_log_likelihood_shared": -261.29496905645135,
+      "convergence": {
+        "both_cues": "gradient_tolerance",
+        "white": "gradient_tolerance",
+        "red": "gradient_tolerance"
+      },
+      "iterations": {
+        "both_cues": 3,
+        "white": 4,
+        "red": 2
+      },
+      "seconds": 1.5378658771514893
+    },
+    {
+      "subject_id": "normal_cb_dot_task_20260526_073807_668be7aeec30f3aae126f42a",
+      "status": "ok",
+      "condition": "normal_cb",
+      "omega_2_shared": -4.305349053696534,
+      "omega_2_white": -5.005245493366905,
+      "omega_2_red": -2.6169112751125425,
+      "cue_gap": -2.3883342182543625,
+      "input_log_likelihood_shared": -261.9792761030268,
+      "convergence": {
+        "both_cues": "gradient_tolerance",
+        "white": "gradient_tolerance",
+        "red": "gradient_tolerance"
+      },
+      "iterations": {
+        "both_cues": 3,
+        "white": 3,
+        "red": 3
+      },
+      "seconds": 1.6044139862060547
+    },
+    {
+      "subject_id": "normal_cb_dot_task_20260526_073914_671b68a76d6acb526141c2a4",
+      "status": "ok",
+      "condition": "normal_cb",
+      "omega_2_shared": -4.452412525257869,
+      "omega_2_white": -5.438284182875706,
+      "omega_2_red": -2.558367636381619,
+      "cue_gap": -2.879916546494087,
+      "input_log_likelihood_shared": -263.24949550100126,
+      "convergence": {
+        "both_cues": "gradient_tolerance",
+        "white": "gradient_tolerance",
+        "red": "gradient_tolerance"
+      },
+      "iterations": {
+        "both_cues": 3,
+        "white": 4,
+        "red": 3
+      },
+      "seconds": 1.658440113067627
+    },
+    {
+      "subject_id": "normal_cb_dot_task_20260526_111029_663390d518d57b7e28e891bc",
+      "status": "ok",
+      "condition": "normal_cb",
+      "omega_2_shared": -3.6495732073789657,
+      "omega_2_white": -4.580422059776832,
+      "omega_2_red": -2.5863552765066515,
+      "cue_gap": -1.9940667832701804,
+      "input_log_likelihood_shared": -261.4007799379275,
+      "convergence": {
+        "both_cues": "gradient_tolerance",
+        "white": "gradient_tolerance",
+        "red": "gradient_tolerance"
+      },
+      "iterations": {
+        "both_cues": 3,
+        "white": 3,
+        "red": 3
+      },
+      "seconds": 1.5846526622772217
+    },
+    {
+      "subject_id": "normal_cb_dot_task_20260526_150238_6924dee4e21024f281ffd6b3",
+      "status": "ok",
+      "condition": "normal_cb",
+      "omega_2_shared": -4.763599748992015,
+      "omega_2_white": -5.140615770938158,
+      "omega_2_red": -2.534735580217502,
+      "cue_gap": -2.605880190720656,
+      "input_log_likelihood_shared": -262.2656806045385,
+      "convergence": {
+        "both_cues": "gradient_tolerance",
+        "white": "gradient_tolerance",
+        "red": "gradient_tolerance"
+      },
+      "iterations": {
+        "both_cues": 3,
+        "white": 4,
+        "red": 2
+      },
+      "seconds": 1.6069819927215576
+    },
+    {
+      "subject_id": "normal_dot_task_20260525_224252_608f2aa883599160c8b87a79",
+      "status": "ok",
+      "condition": "normal",
+      "omega_2_shared": -3.1519275375399864,
+      "omega_2_white": -4.674689612893215,
+      "omega_2_red": -2.071553314485449,
+      "cue_gap": -2.603136298407766,
+      "input_log_likelihood_shared": -251.06860111475515,
+      "convergence": {
+        "both_cues": "gradient_tolerance",
+        "white": "gradient_tolerance",
+        "red": "gradient_tolerance"
+      },
+      "iterations": {
+        "both_cues": 2,
+        "white": 4,
+        "red": 3
+      },
+      "seconds": 1.6099708080291748
+    },
+    {
+      "subject_id": "normal_dot_task_20260525_234250_6138d26ce6302b626fcf805c",
+      "status": "ok",
+      "condition": "normal",
+      "omega_2_shared": -4.0,
+      "omega_2_white": -4.9709483899739135,
+      "omega_2_red": -2.6792054598140282,
+      "cue_gap": -2.2917429301598853,
+      "input_log_likelihood_shared": -258.3207164327268,
+      "convergence": {
+        "both_cues": "gradient_tolerance",
+        "white": "gradient_tolerance",
+        "red": "gradient_tolerance"
+      },
+      "iterations": {
+        "both_cues": 1,
+        "white": 4,
+        "red": 1
+      },
+      "seconds": 1.1304829120635986
+    },
+    {
+      "subject_id": "normal_dot_task_20260525_234414_69d6ab3242935b062b08dfae",
+      "status": "ok",
+      "condition": "normal",
+      "omega_2_shared": -3.399764544939828,
+      "omega_2_white": -4.400631502921616,
+      "omega_2_red": -2.400840420122078,
+      "cue_gap": -1.999791082799538,
+      "input_log_likelihood_shared": -259.990058708642,
+      "convergence": {
+        "both_cues": "gradient_tolerance",
+        "white": "gradient_tolerance",
+        "red": "gradient_tolerance"
+      },
+      "iterations": {
+        "both_cues": 2,
+        "white": 3,
+        "red": 3
+      },
+      "seconds": 1.4488868713378906
+    },
+    {
+      "subject_id": "normal_dot_task_20260526_014540_69dfc80acfee5e3693080e2e",
+      "status": "ok",
+      "condition": "normal",
+      "omega_2_shared": -3.83301084588837,
+      "omega_2_white": -4.665459145547879,
+      "omega_2_red": -2.805503576550224,
+      "cue_gap": -1.859955568997655,
+      "input_log_likelihood_shared": -260.2246247988645,
+      "convergence": {
+        "both_cues": "gradient_tolerance",
+        "white": "gradient_tolerance",
+        "red": "gradient_tolerance"
+      },
+      "iterations": {
+        "both_cues": 3,
+        "white": 4,
+        "red": 1
+      },
+      "seconds": 1.5037691593170166
+    },
+    {
+      "subject_id": "normal_dot_task_20260526_015619_69a49cab42939e7f5ec63c2d",
+      "status": "ok",
+      "condition": "normal",
+      "omega_2_shared": -4.07767582966997,
+      "omega_2_white": -5.022653899136545,
+      "omega_2_red": -2.7382410524762997,
+      "cue_gap": -2.284412846660245,
+      "input_log_likelihood_shared": -261.22149441753504,
+      "convergence": {
+        "both_cues": "gradient_tolerance",
+        "white": "gradient_tolerance",
+        "red": "gradient_tolerance"
+      },
+      "iterations": {
+        "both_cues": 2,
+        "white": 3,
+        "red": 2
+      },
+      "seconds": 1.309201717376709
+    },
+    {
+      "subject_id": "normal_dot_task_20260526_025206_697b498da8f96b947991b7cb",
+      "status": "ok",
+      "condition": "normal",
+      "omega_2_shared": -4.789206173715257,
+      "omega_2_white": -5.288190845187907,
+      "omega_2_red": -2.932594392346913,
+      "cue_gap": -2.3555964528409943,
+      "input_log_likelihood_shared": -262.2967591900455,
+      "convergence": {
+        "both_cues": "gradient_tolerance",
+        "white": "gradient_tolerance",
+        "red": "gradient_tolerance"
+      },
+      "iterations": {
+        "both_cues": 3,
+        "white": 4,
+        "red": 2
+      },
+      "seconds": 1.5898818969726562
+    },
+    {
+      "subject_id": "normal_dot_task_20260526_063321_5f4fbebb8bb76c0c01881651",
+      "status": "ok",
+      "condition": "normal",
+      "omega_2_shared": -4.718452882961494,
+      "omega_2_white": -5.461649286431901,
+      "omega_2_red": -1.667230257413674,
+      "cue_gap": -3.794419029018227,
+      "input_log_likelihood_shared": -262.68651264653863,
+      "convergence": {
+        "both_cues": "gradient_tolerance",
+        "white": "gradient_tolerance",
+        "red": "gradient_tolerance"
+      },
+      "iterations": {
+        "both_cues": 3,
+        "white": 4,
+        "red": 3
+      },
+      "seconds": 1.709773063659668
+    },
+    {
+      "subject_id": "normal_dot_task_20260526_073555_69fc3867a106e80c215e6bba",
+      "status": "ok",
+      "condition": "normal",
+      "omega_2_shared": -3.7770140330571373,
+      "omega_2_white": -5.342618657287302,
+      "omega_2_red": -2.0799088715345517,
+      "cue_gap": -3.26270978575275,
+      "input_log_likelihood_shared": -262.3423916342605,
+      "convergence": {
+        "both_cues": "gradient_tolerance",
+        "white": "gradient_tolerance",
+        "red": "gradient_tolerance"
+      },
+      "iterations": {
+        "both_cues": 3,
+        "white": 4,
+        "red": 3
+      },
+      "seconds": 1.6978018283843994
+    },
+    {
+      "subject_id": "normal_dot_task_20260526_074541_615b6be9794a52e4f560b5e7",
+      "status": "ok",
+      "condition": "normal",
+      "omega_2_shared": -3.8317892751867446,
+      "omega_2_white": -5.123468019190144,
+      "omega_2_red": -2.2302758098830693,
+      "cue_gap": -2.8931922093070743,
+      "input_log_likelihood_shared": -259.28966536298765,
+      "convergence": {
+        "both_cues": "gradient_tolerance",
+        "white": "gradient_tolerance",
+        "red": "gradient_tolerance"
+      },
+      "iterations": {
+        "both_cues": 3,
+        "white": 4,
+        "red": 3
+      },
+      "seconds": 1.785301923751831
+    },
+    {
+      "subject_id": "normal_dot_task_20260526_123640_69b013cfa89933da084a9417",
+      "status": "ok",
+      "condition": "normal",
+      "omega_2_shared": -4.906918898569681,
+      "omega_2_white": -5.4754425345665405,
+      "omega_2_red": -2.1080763177469093,
+      "cue_gap": -3.367366216819631,
+      "input_log_likelihood_shared": -262.5973635205735,
+      "convergence": {
+        "both_cues": "gradient_tolerance",
+        "white": "gradient_tolerance",
+        "red": "gradient_tolerance"
+      },
+      "iterations": {
+        "both_cues": 3,
+        "white": 4,
+        "red": 3
+      },
+      "seconds": 1.6607890129089355
+    },
+    {
+      "subject_id": "reverse_cb_dot_task_20260525_233258_6a1099d4297bc1abb5901bab",
+      "status": "ok",
+      "condition": "reverse_cb",
+      "omega_2_shared": -4.88845920042354,
+      "omega_2_white": -5.206347465292716,
+      "omega_2_red": -2.531072752427179,
+      "cue_gap": -2.675274712865537,
+      "input_log_likelihood_shared": -259.2840555248081,
+      "convergence": {
+        "both_cues": "gradient_tolerance",
+        "white": "gradient_tolerance",
+        "red": "gradient_tolerance"
+      },
+      "iterations": {
+        "both_cues": 4,
+        "white": 4,
+        "red": 2
+      },
+      "seconds": 1.8321011066436768
+    },
+    {
+      "subject_id": "reverse_cb_dot_task_20260526_013316_697a94d33b165fe833a3c9ea",
+      "status": "ok",
+      "condition": "reverse_cb",
+      "omega_2_shared": -4.898425464201445,
+      "omega_2_white": -5.081065061589052,
+      "omega_2_red": -3.2076602034271966,
+      "cue_gap": -1.8734048581618552,
+      "input_log_likelihood_shared": -258.34442457160276,
+      "convergence": {
+        "both_cues": "gradient_tolerance",
+        "white": "gradient_tolerance",
+        "red": "gradient_tolerance"
+      },
+      "iterations": {
+        "both_cues": 3,
+        "white": 3,
+        "red": 2
+      },
+      "seconds": 1.4708869457244873
+    },
+    {
+      "subject_id": "reverse_cb_dot_task_20260526_013654_6a0f881a72ca6302ca575c8a",
+      "status": "ok",
+      "condition": "reverse_cb",
+      "omega_2_shared": -3.733683667871582,
+      "omega_2_white": -4.7207441714363725,
+      "omega_2_red": -2.4223134059306144,
+      "cue_gap": -2.298430765505758,
+      "input_log_likelihood_shared": -259.0730178880549,
+      "convergence": {
+        "both_cues": "gradient_tolerance",
+        "white": "gradient_tolerance",
+        "red": "gradient_tolerance"
+      },
+      "iterations": {
+        "both_cues": 3,
+        "white": 4,
+        "red": 3
+      },
+      "seconds": 1.7264211177825928
+    },
+    {
+      "subject_id": "reverse_cb_dot_task_20260526_063757_5b2c0994f1ca3c000190196a",
+      "status": "ok",
+      "condition": "reverse_cb",
+      "omega_2_shared": -4.849528608636884,
+      "omega_2_white": -4.788356241682867,
+      "omega_2_red": -3.526026623840045,
+      "cue_gap": -1.262329617842822,
+      "input_log_likelihood_shared": -257.77410589842447,
+      "convergence": {
+        "both_cues": "gradient_tolerance",
+        "white": "gradient_tolerance",
+        "red": "gradient_tolerance"
+      },
+      "iterations": {
+        "both_cues": 3,
+        "white": 2,
+        "red": 3
+      },
+      "seconds": 1.4458558559417725
+    },
+    {
+      "subject_id": "reverse_cb_dot_task_20260526_073606_67c87fc1b3ba111d0e1526a0",
+      "status": "ok",
+      "condition": "reverse_cb",
+      "omega_2_shared": -3.9465253682971455,
+      "omega_2_white": -4.645458350257018,
+      "omega_2_red": -2.7296773543842257,
+      "cue_gap": -1.915780995872792,
+      "input_log_likelihood_shared": -258.4593342297184,
+      "convergence": {
+        "both_cues": "gradient_tolerance",
+        "white": "gradient_tolerance",
+        "red": "gradient_tolerance"
+      },
+      "iterations": {
+        "both_cues": 2,
+        "white": 4,
+        "red": 3
+      },
+      "seconds": 1.5752179622650146
+    },
+    {
+      "subject_id": "reverse_cb_dot_task_20260526_073723_60b29948c3753b3707dffe90",
+      "status": "ok",
+      "condition": "reverse_cb",
+      "omega_2_shared": -4.723584048057021,
+      "omega_2_white": -5.227269492953224,
+      "omega_2_red": -3.0167465748149254,
+      "cue_gap": -2.2105229181382984,
+      "input_log_likelihood_shared": -256.08357365242534,
+      "convergence": {
+        "both_cues": "gradient_tolerance",
+        "white": "gradient_tolerance",
+        "red": "gradient_tolerance"
+      },
+      "iterations": {
+        "both_cues": 3,
+        "white": 4,
+        "red": 1
+      },
+      "seconds": 1.476975917816162
+    },
+    {
+      "subject_id": "reverse_cb_dot_task_20260526_074755_60969f2e675df62d497647c2",
+      "status": "ok",
+      "condition": "reverse_cb",
+      "omega_2_shared": -4.307226460152837,
+      "omega_2_white": -4.629365506915334,
+      "omega_2_red": -2.8049903909946807,
+      "cue_gap": -1.824375115920653,
+      "input_log_likelihood_shared": -258.06511866648435,
+      "convergence": {
+        "both_cues": "gradient_tolerance",
+        "white": "gradient_tolerance",
+        "red": "gradient_tolerance"
+      },
+      "iterations": {
+        "both_cues": 3,
+        "white": 3,
+        "red": 1
+      },
+      "seconds": 1.4143600463867188
+    },
+    {
+      "subject_id": "reverse_cb_dot_task_20260526_144035_6992122ad3bd4dd2cfc928dd",
+      "status": "ok",
+      "condition": "reverse_cb",
+      "omega_2_shared": -5.281435118981992,
+      "omega_2_white": -5.453650743716283,
+      "omega_2_red": -3.5423535425372825,
+      "cue_gap": -1.9112972011790004,
+      "input_log_likelihood_shared": -258.1467362430732,
+      "convergence": {
+        "both_cues": "gradient_tolerance",
+        "white": "gradient_tolerance",
+        "red": "gradient_tolerance"
+      },
+      "iterations": {
+        "both_cues": 4,
+        "white": 4,
+        "red": 3
+      },
+      "seconds": 1.8771817684173584
+    },
+    {
+      "subject_id": "reverse_cb_dot_task_20260529_120008_665ae83fe8e62bc79a731fb9",
+      "status": "ok",
+      "condition": "reverse_cb",
+      "omega_2_shared": -4.916997812854946,
+      "omega_2_white": -5.184322337815536,
+      "omega_2_red": -2.931870712279883,
+      "cue_gap": -2.2524516255356533,
+      "input_log_likelihood_shared": -259.10322468823813,
+      "convergence": {
+        "both_cues": "gradient_tolerance",
+        "white": "gradient_tolerance",
+        "red": "gradient_tolerance"
+      },
+      "iterations": {
+        "both_cues": 4,
+        "white": 3,
+        "red": 2
+      },
+      "seconds": 1.653454065322876
+    },
+    {
+      "subject_id": "reverse_cb_dot_task_20260603_052005_6981128082d28d2191154253",
+      "status": "ok",
+      "condition": "reverse_cb",
+      "omega_2_shared": -5.204845735966477,
+      "omega_2_white": -5.361335562399659,
+      "omega_2_red": -3.1975514501392244,
+      "cue_gap": -2.1637841122604344,
+      "input_log_likelihood_shared": -258.6371526752855,
+      "convergence": {
+        "both_cues": "gradient_tolerance",
+        "white": "gradient_tolerance",
+        "red": "gradient_tolerance"
+      },
+      "iterations": {
+        "both_cues": 4,
+        "white": 4,
+        "red": 2
+      },
+      "seconds": 1.832913875579834
+    },
+    {
+      "subject_id": "reverse_dot_task_20260525_233711_69fd3a78b09c348db5ab2dd2",
+      "status": "ok",
+      "condition": "reverse",
+      "omega_2_shared": -5.459215899428869,
+      "omega_2_white": -5.398460002444291,
+      "omega_2_red": -2.2300732915911823,
+      "cue_gap": -3.1683867108531087,
+      "input_log_likelihood_shared": -259.34986430668073,
+      "convergence": {
+        "both_cues": "gradient_tolerance",
+        "white": "gradient_tolerance",
+        "red": "gradient_tolerance"
+      },
+      "iterations": {
+        "both_cues": 4,
+        "white": 4,
+        "red": 3
+      },
+      "seconds": 1.8778047561645508
+    },
+    {
+      "subject_id": "reverse_dot_task_20260526_063518_63174af7d57182f9bf90c094",
+      "status": "ok",
+      "condition": "reverse",
+      "omega_2_shared": -3.931215418499203,
+      "omega_2_white": -5.273705868724816,
+      "omega_2_red": -2.3517885475642037,
+      "cue_gap": -2.9219173211606124,
+      "input_log_likelihood_shared": -258.5207854724474,
+      "convergence": {
+        "both_cues": "gradient_tolerance",
+        "white": "gradient_tolerance",
+        "red": "gradient_tolerance"
+      },
+      "iterations": {
+        "both_cues": 2,
+        "white": 4,
+        "red": 3
+      },
+      "seconds": 1.5394432544708252
+    },
+    {
+      "subject_id": "reverse_dot_task_20260526_063530_6a00e5e9deafdfa23003cacb",
+      "status": "ok",
+      "condition": "reverse",
+      "omega_2_shared": -4.638762983711626,
+      "omega_2_white": -4.962983427767841,
+      "omega_2_red": -3.0655606802514206,
+      "cue_gap": -1.8974227475164205,
+      "input_log_likelihood_shared": -257.7523974852771,
+      "convergence": {
+        "both_cues": "gradient_tolerance",
+        "white": "gradient_tolerance",
+        "red": "gradient_tolerance"
+      },
+      "iterations": {
+        "both_cues": 3,
+        "white": 3,
+        "red": 1
+      },
+      "seconds": 1.3770148754119873
+    },
+    {
+      "subject_id": "reverse_dot_task_20260526_063635_5c49b156f5e26d0001479b44",
+      "status": "ok",
+      "condition": "reverse",
+      "omega_2_shared": -5.220711748697329,
+      "omega_2_white": -5.1833100271907675,
+      "omega_2_red": -2.949574812260982,
+      "cue_gap": -2.2337352149297853,
+      "input_log_likelihood_shared": -258.90991735804573,
+      "convergence": {
+        "both_cues": "gradient_tolerance",
+        "white": "gradient_tolerance",
+        "red": "gradient_tolerance"
+      },
+      "iterations": {
+        "both_cues": 4,
+        "white": 4,
+        "red": 1
+      },
+      "seconds": 1.681807041168213
+    },
+    {
+      "subject_id": "reverse_dot_task_20260526_073406_5a9aa66a35237b000112937b",
+      "status": "ok",
+      "condition": "reverse",
+      "omega_2_shared": -4.725363820163741,
+      "omega_2_white": -5.4263021714497075,
+      "omega_2_red": -2.808006112666017,
+      "cue_gap": -2.6182960587836903,
+      "input_log_likelihood_shared": -257.9208945862831,
+      "convergence": {
+        "both_cues": "gradient_tolerance",
+        "white": "gradient_tolerance",
+        "red": "gradient_tolerance"
+      },
+      "iterations": {
+        "both_cues": 4,
+        "white": 4,
+        "red": 2
+      },
+      "seconds": 1.8397350311279297
+    },
+    {
+      "subject_id": "reverse_dot_task_20260526_074204_66b8b996ba8542d9cbd3f5a3",
+      "status": "ok",
+      "condition": "reverse",
+      "omega_2_shared": -4.107924718513321,
+      "omega_2_white": -5.250367230105993,
+      "omega_2_red": -2.5,
+      "cue_gap": -2.7503672301059927,
+      "input_log_likelihood_shared": -258.27151412724527,
+      "convergence": {
+        "both_cues": "gradient_tolerance",
+        "white": "gradient_tolerance",
+        "red": "gradient_tolerance"
+      },
+      "iterations": {
+        "both_cues": 3,
+        "white": 4,
+        "red": 1
+      },
+      "seconds": 1.4950709342956543
+    },
+    {
+      "subject_id": "reverse_dot_task_20260528_213806_69f38d3a5d1042981ba878c1",
+      "status": "ok",
+      "condition": "reverse",
+      "omega_2_shared": -5.277862777578951,
+      "omega_2_white": -5.216280163496961,
+      "omega_2_red": -2.6289137913023763,
+      "cue_gap": -2.5873663721945848,
+      "input_log_likelihood_shared": -258.9082150249744,
+      "convergence": {
+        "both_cues": "gradient_tolerance",
+        "white": "gradient_tolerance",
+        "red": "gradient_tolerance"
+      },
+      "iterations": {
+        "both_cues": 4,
+        "white": 4,
+        "red": 1
+      },
+      "seconds": 1.6743059158325195
+    }
+  ]
+}

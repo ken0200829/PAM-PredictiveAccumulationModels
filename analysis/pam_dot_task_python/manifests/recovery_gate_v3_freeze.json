@@ -1,0 +1,32 @@
+{
+  "frozen_before_inspecting_v3_recovery_results": true,
+  "frozen_on": "2026-07-21",
+  "formulation_version": "tie-hold-hgf__tie-direction-zero-v-zero__1.0.0",
+  "gate_rule": "Both declared grids must pass every RECOVERY_CRITERIA_V1 parameter criterion.",
+  "criteria": {
+    "version": "recovery-criteria-1.0.0",
+    "digest": "f9336c2218a5c6a1a3fac0db31b60b80cae194fa94f2a8c8c6e75e2fa17b3c83",
+    "min_correlation": 0.7,
+    "max_absolute_bias": 0.5,
+    "max_rmse_over_prior_sd": 1.0,
+    "min_cases_per_parameter": 20
+  },
+  "grids": [
+    {
+      "version": "recovery-grid-ddm_w-tie_v0-3.1.0",
+      "model_id": "ddm_w",
+      "cases": 32,
+      "seed_first": 20260801,
+      "seed_last": 20260832,
+      "digest": "ad0555f74e46024146ee7ae4230064c8b60227d19fb9c70542453029405a08d3"
+    },
+    {
+      "version": "recovery-grid-ddm_full_c-tie_v0-3.1.0",
+      "model_id": "ddm_full_c",
+      "cases": 32,
+      "seed_first": 20260851,
+      "seed_last": 20260882,
+      "digest": "abe447684a5c8b65fe2117a17d64e0bde31d185993115a911f6e2551f0cd9dc3"
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "matlab_version": "26.1.0.3312084 (R2026a) Update 4",
+  "architecture": "GLNXA64",
+  "interpreter": "matlab",
+  "function_names": ["tapas_fitModel", "tapas_ehgf_binary", "tapas_ehgf_binary_transp", "tapas_quasinewton_optim", "tapas_sgm", "spm_BMS_gibbs", "spm_BMS", "ddm_hgf", "ddm_hgf_transp", "utl_wfpt", "cue_ehgf_binary", "ddm_hgf_coherence"],
+  "resolved_paths": ["/MATLAB Drive/matlab_online_fixture_bundle/analysis/pam_dot_task/external/tapas/HGF/tapas_fitModel.m", "/MATLAB Drive/matlab_online_fixture_bundle/analysis/pam_dot_task/external/tapas/HGF/tapas_ehgf_binary.m", "/MATLAB Drive/matlab_online_fixture_bundle/analysis/pam_dot_task/external/tapas/HGF/tapas_ehgf_binary_transp.m", "/MATLAB Drive/matlab_online_fixture_bundle/analysis/pam_dot_task/external/tapas/HGF/tapas_quasinewton_optim.m", "/MATLAB Drive/matlab_online_fixture_bundle/analysis/pam_dot_task/external/tapas/HGF/tapas_sgm.m", "/MATLAB Drive/matlab_online_fixture_bundle/analysis/pam_dot_task/external/spm12/spm_BMS_gibbs.m", "/MATLAB Drive/matlab_online_fixture_bundle/analysis/pam_dot_task/external/spm12/spm_BMS.m", "/MATLAB Drive/matlab_online_fixture_bundle/PAM_master/PAM_HGF/DDM/ddm_hgf.m", "/MATLAB Drive/matlab_online_fixture_bundle/PAM_master/PAM_HGF/DDM/ddm_hgf_transp.m", "/MATLAB Drive/matlab_online_fixture_bundle/PAM_master/PAM_HGF/DDM/utl/utl_wfpt.m", "/MATLAB Drive/matlab_online_fixture_bundle/analysis/pam_dot_task/matlab/models/cue_ehgf_binary.m", "/MATLAB Drive/matlab_online_fixture_bundle/analysis/pam_dot_task/matlab/models/ddm_hgf_coherence.m"]
+}

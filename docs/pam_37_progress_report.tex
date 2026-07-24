@@ -1,0 +1,401 @@
+% コンパイル: lualatex pam_37_progress_report.tex
+% (日本語は LuaLaTeX + luatexja-preset を使用。Overleaf では Compiler を LuaLaTeX に設定)
+\documentclass[11pt]{ltjsarticle}
+\usepackage{luatexja-preset}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{geometry}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+\usepackage{xcolor}
+\geometry{a4paper,margin=25mm}
+
+\newcommand{\code}[1]{\texttt{#1}}
+
+\title{PAM joint-MAP 37名解析\\進捗報告}
+\author{解析: Python parity 実装層}
+\date{2026年7月22日}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+本報告は、37名の dot task データへ PAM (Predictive Accumulation Models) の
+joint-MAP 推定を適用する統合計画の実装進捗をまとめる。有償 MATLAB ライセンスが
+利用できないため、PAM/TAPAS/SPM12 の該当機能を独立に Python へ移植した parity 層
+（\code{analysis/pam\_dot\_task\_python/}）を主たる解析経路とし、MATLAB 参照層は
+数式・パラメータ化の凍結参照として保持している。本報告時点で実装は概ね完了し、
+検証（数値 parity 照合、parameter recovery）の段階にある。実装過程で、公式デモが
+踏むべき事前分布較正手順の欠落、事前平均の系統的な誤設定、\code{omega\_2} の
+実用的識別可能性の弱さという、科学的判断を要する所見が得られた。
+\end{abstract}
+
+\tableofcontents
+
+\section{全体状況}
+
+解析エンジンは独立 Python 再実装層に置かれ、PAM 本体・TAPAS・SPM12・生 CSV は
+一切変更していない。ソース対応表は \code{PARITY.md} に、事前凍結した意思決定は
+\code{gates.py} にハッシュ付きで保持している。現在のコード規模は約 4{,}300 行、
+標準ライブラリ \code{unittest} によるテストは 142 件で全通過している。
+
+\paragraph{凍結の原則}
+統合計画は「結果を見る前に固定すべき意思決定」（PPC ウィンドウ定義、生成反復数、
+Laplace 採否閾値、parameter recovery グリッドと合格基準）を要求する。これらは
+\code{gates.py} にバージョン付き・SHA-256 ハッシュ可能なデータとして格納し、
+run manifest から参照する。旧版も記録として残し、上書きしない。
+
+\section{採用モデルの定式化}
+\label{sec:formulation}
+
+\subsection{入力と二本の cue 別 eHGF}
+
+試行を \(r=1,\ldots,R\) とし、\(g_r\in\{\mathrm{white},\mathrm{red}\}\) を
+提示 cue、\(s_r\in\{0,1\}\) を非 tie 試行の刺激カテゴリ（1が白優位）、
+\(c_r\in[-1,1]\) を signed coherence とする。データ上は
+
+\[
+c_r=2\,\mathtt{ratio\_corrected}_r-1,
+\qquad
+T_r=\mathbb{I}(c_r=0)
+\]
+
+であり、\(T_r=1\) が白100・黒100ドットの tie 試行である。
+
+知覚層には、白 cue 用と赤 cue 用の二本の effective two-level binary eHGF を置く。
+二本は潜在状態を別々に持つが、HGF パラメータは同一被験者内で共有する。cue
+\(j\in\{\mathrm{white},\mathrm{red}\}\) の情報のある局所試行 \(n\) に対する生成的な
+表現は
+
+\begin{align}
+x^{(j)}_{2,n}
+  &\sim \mathcal{N}\!\left(x^{(j)}_{2,n-1},\exp(\omega_2)\right),\\
+s^{(j)}_n\mid x^{(j)}_{2,n}
+  &\sim \operatorname{Bernoulli}\!\left(\sigma(x^{(j)}_{2,n})\right),
+\qquad
+\sigma(x)=\frac{1}{1+e^{-x}} .
+\end{align}
+
+ここで \(\omega_2\) が信念変化の速さを支配する自由な知覚パラメータである。各
+global trial では提示された cue の系列だけを参照し、非提示 cue の状態は更新しない。
+応答モデルへ渡す量は、当該試行の観測を取り込む\emph{前}の active-cue 白カテゴリ
+予測確率
+
+\[
+\hat\mu_r
+  =P(s_r=1\mid \text{同じ cue の試行 }r\text{ より前の履歴})
+\]
+
+である。tie ではカテゴリ観測を与えず、
+
+\[
+\mu_{1,r}=\hat\mu_r,
+\qquad
+\delta_{1,r}=\mu_{1,r}-\hat\mu_r=0
+\]
+
+として HGF 状態を保持する。したがって tie 自身は学習を生じないが、その時点での
+予測 \(\hat\mu_r\) は応答尤度へ残る。TAPAS の \code{ign} 分岐が返す1試行古い予測は
+用いない。
+
+\subsection{HGF から試行別 DDM パラメータへの写像}
+
+予測確率から確信度様の決定論的変調量
+
+\[
+q_r=\sigma\!\left(\frac{1}{\hat\mu_r(1-\hat\mu_r)}-4\right)-0.5
+\]
+
+を作る。非 tie 試行について、提示カテゴリに割り当てられる事前確率と drift の方向を
+
+\begin{align}
+p_{\mathrm{presented},r}
+  &=s_r\hat\mu_r+(1-s_r)(1-\hat\mu_r),\\
+d_r&=2s_r-1
+\end{align}
+
+とする。承認済み coherence 拡張を含む試行別 DDM は
+
+\begin{align}
+w_r &=0.5+b_w(\hat\mu_r-0.5),\label{eq:w}\\
+a_r &=a_a+b_a q_r,\label{eq:a}\\
+v_r &=d_r\left\{a_v+b_c|c_r|
+       +b_v(p_{\mathrm{presented},r}-0.5)\right\},\label{eq:v}\\
+Ter_r&=Ter.\label{eq:ter}
+\end{align}
+
+\(w_r\in(0,1)\) は境界間で正規化した開始点であり、通常の開始点記号 \(z_r\) では
+
+\[
+z_r=a_r w_r
+\]
+
+に相当する。従って本モデルの cue 駆動バイアスは式~\eqref{eq:w} に明示され、
+\(b_w>0\) なら白カテゴリの事前確率が高いほど開始点を白反応境界側へ移す。
+\(b_a\neq0\) のモデルでは、物理的開始点 \(z_r\) は境界幅 \(a_r\) の変化も受ける。
+
+\(a_a\) は基準境界幅、\(a_v\) は基準 drift magnitude、\(b_w\) は信念から開始点、
+\(b_a\) は確信度様量から境界幅、\(b_v\) は提示カテゴリ信念から drift magnitude、
+\(b_c\) は coherence magnitude から drift magnitude への効果である。
+\(b_c=0\) とすれば、非 tie 試行の式~\eqref{eq:v} は公式 PAM の二値 DDM と一致する。
+
+\paragraph{tie に対する確定仕様（案A）}
+tie では \(s_r\) と \(p_{\mathrm{presented},r}\) は概念上定義されないため、
+
+\[
+d_r=0,
+\qquad
+v_r=0
+\]
+
+と定める。このとき式~\eqref{eq:w} と式~\eqref{eq:a} は通常どおり active-cue の
+\(\hat\mu_r\) から計算され、選択は開始点バイアスと拡散ノイズによって決まる。
+したがって tie は感覚証拠を混入させずに \(b_w\) を検査する試行となる。非 tie
+試行では式~\eqref{eq:v} を変更しない。
+
+\subsection{モデル縮約、変換、joint-MAP}
+
+公式モデル群では \(b_c=0\) とし、\code{ddm\_null}、\code{ddm\_w}、
+\code{ddm\_a}、\code{ddm\_v}、\code{ddm\_full} の順に、それぞれ
+
+\[
+\varnothing,\quad \{b_w\},\quad \{b_a\},\quad \{b_v\},\quad
+\{b_w,b_a,b_v\}
+\]
+
+を自由な belief 関連傾きとする。coherence 対応モデル
+\code{ddm\_c}、\code{ddm\_w\_c}、\code{ddm\_a\_c}、
+\code{ddm\_v\_c}、\code{ddm\_full\_c} は、対応する集合へ常に \(b_c\) を加える。
+使わない傾きは事前分散0、平均0として厳密に固定する。
+
+\paragraph{現在回収中の \code{ddm\_w}}
+\(b_a=b_v=b_c=0\) と固定するため、
+
+\[
+w_r=0.5+b_w(\hat\mu_r-0.5),\qquad
+a_r=a_a,\qquad
+v_r=
+\begin{cases}
+(2s_r-1)a_v,&T_r=0,\\
+0,&T_r=1
+\end{cases}
+\]
+
+となる。従って非 tie 試行の drift は刺激カテゴリだけで決まり、HGF 信念が DDM
+へ入る経路は開始点 \(w_r\) のみである。自由パラメータは
+\(\{\omega_2,\log a_a,\log a_v,\theta_w,\theta_{Ter}\}\) の5個であり、現在の
+parameter recovery はこの \(\omega_2\)--\(b_w\) 経路を直接検査している。
+
+最適化空間 \(\boldsymbol\theta\) から native space への変換は
+
+\begin{align}
+a_a&=\exp(\theta_{a_a}), &
+a_v&=\exp(\theta_{a_v}),\\
+b_w&=2\sigma(\theta_w)-1, &
+Ter&=\min(RT_{\mathrm{valid}})\sigma(\theta_{Ter}),
+\end{align}
+
+であり、\(b_a,b_v,b_c\) は無制約である。尤度に含める各試行では
+\(0<w_r<1\)、\(a_r>0\)、\(0<Ter<RT_r\) を要求する。choice と決定時間
+\(RT_r-Ter\) の同時密度を Wiener first-passage time 密度
+\(f_{\mathrm{WFPT}}\) とすると、推定量は
+
+\[
+\hat{\boldsymbol\theta}_{\mathrm{MAP}}
+=\arg\min_{\boldsymbol\theta}
+\left[
+-\sum_{r\in\mathcal{V}}
+ \log f_{\mathrm{WFPT}}(y_r,RT_r-Ter\mid w_r,a_r,v_r)
+-\log p(\boldsymbol\theta_{\mathrm{HGF}})
+-\log p(\boldsymbol\theta_{\mathrm{DDM}})
+\right],
+\]
+
+ここで \(\mathcal{V}\) は応答尤度へ含める有効試行集合である。二本の HGF と DDM は
+この単一目的関数の中で同時推定され、HGF を先に固定する二段階推定ではない。ただし
+被験者別ベイズ最適 \(\omega_2\) は入力系列だけから求め、joint fit における
+\(\omega_2\) の事前\emph{平均}として用いる。
+
+\section{本セッションで完了した作業}
+
+\begin{enumerate}[leftmargin=1.4em]
+  \item \textbf{Gate-PPC 閾値の凍結}（\code{GATE\_PPC\_V1}）。窓定義、生成反復数、
+        seed、Laplace 対 MAP 退避規則、統計量、tail 定義、global discrepancy の
+        標準化、同時予測帯水準、モデル採否の系統的乖離基準を凍結。閾値の根拠は
+        docstring に明記した（\S\ref{sec:threshold} 参照）。
+  \item \textbf{parameter recovery グリッドと合格基準の宣言}。詳細は
+        \S\ref{sec:recovery}。
+  \item \textbf{被験者別ベイズ最適事前平均の実装}（\code{bayes\_optimal.py}）。
+        公式デモが joint fit 前に踏む較正手順の移植。詳細は \S\ref{sec:bayesopt}。
+  \item \textbf{MATLAB fixture 書き出しスクリプト}
+        （\code{pam\_dot\_task\_export\_fixtures.m} ほか）。被験者データ不要で、
+        380 試行の設計を Lehmer 漸化式から決定論的に生成し、Python 側が同一系列を
+        ビット単位で再構成する。MATLAB Online Basic（無料枠・ツールボックス非依存）
+        で実行可能。
+  \item \textbf{tie 試行の扱いの修正}（\S\ref{sec:tie}）。
+\end{enumerate}
+
+\section{主要な所見}
+
+\subsection{ベイズ最適事前平均の欠落と誤設定}
+\label{sec:bayesopt}
+
+公式デモ \code{DDM\_HGF\_example.m} は joint fit の前に、知覚モデルを入力系列
+\(u\) のみへ当てはめ（\code{tapas\_bayes\_optimal\_binary}）、その結果を事前分布の
+\emph{平均} として設定する（\code{prc\_model.ommu = bo.p\_prc.om}）。この手順は
+応答 \(y\) を一切用いないため、事前分布を実験デザインへ較正するものであり、
+経験ベイズ的な二重使用には当たらない。本 parity 層はこの手順を欠いており、
+TAPAS 既定値 \(\omega_2 = -3\) を固定で用いていた。
+
+37名全員についてベイズ最適 \(\omega_2\) を算出した結果を表~\ref{tab:bo} に示す。
+
+\begin{table}[htbp]
+\centering
+\caption{被験者別ベイズ最適 \(\omega_2\)（共有2系列モデル）の要約（37名）}
+\label{tab:bo}
+\begin{tabular}{lr}
+\toprule
+量 & 値 \\
+\midrule
+共有 \(\omega_2\) 平均 & \(-4.44\) \\
+共有 \(\omega_2\) SD & \(0.57\) \\
+共有 \(\omega_2\) 範囲 & \([-5.46,\ -3.15]\) \\
+既定値 & \(-3.0\)（全員の観測域の外側）\\
+\midrule
+白 \(-\) 赤 の差 平均 & \(-2.41\) \\
+白 \(-\) 赤 の差 範囲 & \([-3.79,\ -1.26]\) \\
+白 \(<\) 赤 の人数 & 37 / 37 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{含意}
+第一に、既定値 \(-3\) は \emph{全 37 名の観測域の外側}にあり、全員が同じ方向へ
+約1事前 SD ずれていた。これは偶然のばらつきではなく、この課題の入力系列が既定値と
+噛み合っていないことを示す。第二に、cue 別に当てはめると白 cue は赤 cue より常に
+低い \(\omega_2\)（更新が遅い）を最適とし、native 単位では赤は白の平均 11 倍の
+信念ドリフトが最適となる。これは Gate~A の「パラメータ共有」仮定が偶発的ノイズ
+ではなく\emph{系統的な妥協}を強いていることを定量的に示す。
+
+なお \(\omega_2\) は effective 2-level eHGF において信念の予測分散の1試行あたり
+増分 \(\exp(\omega_2)\) を与えるパラメータ（学習率に相当）であり、大きいほど信念が
+直近の観測に強く引かれる。
+
+\subsection{\code{omega\_2} の実用的識別可能性}
+\label{sec:identifiability}
+
+自己生成データによる parameter recovery（生成モデルと推定モデルが一致）で、
+\(\omega_2\) の回収が一貫して弱い。これは実データの外れ値やモデル誤特定では
+なく、現在の試行系列と HGF\(\to\)DDM 接続から \(\omega_2\) を逆算する情報が
+弱い（実用的識別可能性の問題）ことを示す。代表被験者での結果を
+表~\ref{tab:recovery} に示す。
+
+\begin{table}[htbp]
+\centering
+\caption{代表被験者・モデル別の回収相関（真値対推定値、変換空間、各 \(n=32\)）}
+\label{tab:recovery}
+\begin{tabular}{lccc}
+\toprule
+パラメータ & \code{ddm\_w} & \code{ddm\_full\_c} & 備考 \\
+\midrule
+\(\omega_2\)（知覚）  & 0.547 & 0.815 & bias 0.19 / 0.47 \\
+\code{log\_a\_a}      & 0.983 & 0.983 & 良好 \\
+\code{log\_a\_v}      & 0.942 & 0.795 & \\
+\code{b\_w}（開始点） & 0.950 & 0.902 & 信念\(\to\)開始点 \\
+\code{b\_a}（境界）   & ---   & 0.883 & \\
+\code{b\_v}（drift）  & ---   & 0.781 & bias \(-0.31\) \\
+\code{b\_c}（coherence） & --- & 0.711 & Gate~B 拡張 \\
+\code{Ter\_logit}     & 0.868 & 0.946 & \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{解釈}
+信念\(\to\)DDM 結合パラメータ（\code{b\_w} など）は応答に直接近く良好に回収される
+一方、その上流の \(\omega_2\) は一段離れており、事前分布・他パラメータとの補償に
+より弱くしか同定されない。ただし次の留保がある。
+\begin{itemize}[leftmargin=1.4em]
+  \item \textbf{事前分布幅との交絡}：現行の事前分散は 2 で、公式デフォルトの 4 より
+        狭い。弱識別パラメータは事前分布が狭いほど推定値が平均へ縮小し、真値との
+        相関が構造的に頭打ちになる。\(\omega_2\) 回収の悪さの一部は\emph{この選択が
+        招いた}可能性があり、これは未決の「分散 2 対 4」判断に直結する。
+  \item \textbf{drift 側の弱さ}：\code{ddm\_full\_c} では開始点側 \code{b\_w}=0.902 に
+        対し drift 側 \code{b\_v}=0.781、\code{b\_c}=0.711 と劣る。coherence 項の
+        識別性は Gate~B（coherence を無視してよいか）の判断に影響する。
+  \item \textbf{高相関＋高バイアス}：\code{ddm\_full\_c} の \(\omega_2\) は相関 0.815
+        でも bias 0.47（事前 SD の約 1/3）で、順序は追えるが系統的にずれる。
+\end{itemize}
+
+\subsection{tie 試行の扱いの修正}
+\label{sec:tie}
+
+coherence \(=0.5\)（白100・黒100ドット、どちらも優位でない）の刺激を、以前は
+黒優位（\code{stimulus\_category}\(=0\)）と分類していた。これを識別不可能
+（tie）に修正した。旧規約では tie を黒とみなすことで白判断率が 0.500 から 0.429 へ
+系統的に押し下げられており、これは純粋な人工物であった。HGF では tie を無視
+（TAPAS の ignored 分岐で1試行前の予測を貼り付ける）のではなく、更新量ゼロの
+恒等更新（\(\mu_1 = \hat\mu_1,\ \delta_1 = 0\)）とし、tie 試行が現在の信念で
+評価されるようにした。tie は刺激証拠ゼロゆえ開始点バイアスの最良プローブであり、
+この修正は \code{b\_w} 中心の推論を支える方向に働く。本修正は Python 層と MATLAB
+参照層の双方に反映済みである。
+
+\section{実行中の作業}
+
+\textbf{複数被験者での回収}（Codex 診断の最優先項目）。\(\omega_2\) の弱さが
+被験者固有（デザイン依存）か構造的かを切り分けるため、各条件の代表4名を
+\code{ddm\_w} グリッド（32ケース、各被験者は自身のベイズ最適 \(\omega_2\) を
+事前平均に使用）で回収中。既存の単一被験者結果（\code{ddm\_w}, 0.547）を
+アンカーに、計5名・全条件で判定する。
+\begin{itemize}[leftmargin=1.4em]
+  \item 4名でばらつく \(\Rightarrow\) デザイン依存（被験者ごとに扱いを変えるか、
+        事前分布依存度を個別報告）。
+  \item 4名とも 0.5 前後で揃う \(\Rightarrow\) 構造的識別性の問題（\(\omega_2\) を
+        ベイズ最適値に固定し、結合パラメータの推論を条件付きで報告）。
+\end{itemize}
+本報告執筆時点で 1 名目を実行中（暫定 \(n=3\) 段階のため数値は未確定）。
+
+\section{未決の科学的判断}
+
+\begin{enumerate}[leftmargin=1.4em]
+  \item \textbf{事前分散を 2 のままか 4 に戻すか}。公式デモ・TAPAS 既定はいずれも 4。
+        現状 2 の理由は記録がなく、\(\omega_2\) 識別性の評価とも交絡する。
+  \item \textbf{Gate~A（cue 共有 対 分離）}。白\(-\)赤差が全員で系統的に生じている
+        ことが判明。共有維持なら共有ベイズ最適値、分離なら白・赤別値を用いる。
+  \item \textbf{\(\omega_2\) を自由推定するか固定するか}。「自由 対 固定」は二択では
+        なく事前分布幅の連続体であり、複数被験者回収の結果を待って決める。
+  \item \textbf{最終 BMS 仕様}。論文忠実版 \code{spm\_BMS\_gibbs} を主、
+        \code{spm\_BMS}（protected exceedance）を感度分析とする方針は合意済み。
+\end{enumerate}
+
+\section{残りの検証ゲート}
+
+\begin{itemize}[leftmargin=1.4em]
+  \item[$\square$] negative log joint の MATLAB との照合
+  \item[$\square$] optimizer 軌跡・MAP・Hessian・LME の MATLAB との照合
+  \item[$\square$] 集約/逐次 PPC 要約の MATLAB fixture との照合
+  \item[$\square$] parameter recovery の正式合格（37名実行前の必須ゲート）
+  \item[$\square$] 残り MATLAB fixture（joint, simulation）の書き出し
+\end{itemize}
+HGF 軌跡、WFPT（2{,}240 点）、試行別 DDM 対数尤度、Gibbs/protected BMS、
+固定期限 DDM シミュレーションの MATLAB Online fixture との照合は通過済み。
+
+\section{閾値の根拠（補遺）}
+\label{sec:threshold}
+
+\begin{description}[leftmargin=0em]
+  \item[\code{max\_condition\_number} \(=10^8\)]
+    Laplace 共分散は数値 Hessian の逆行列で得る。倍精度の相対丸め増幅は
+    \(\kappa\cdot\varepsilon\)（\(\varepsilon=2.22\times10^{-16}\)）で抑えられ、
+    \(\kappa=10^8\) で約 \(2.2\times10^{-8}\)。これは\emph{丸め}のみを拘束し、
+    Ridders 有限差分誤差（より大きい項）は別診断として毎回記録する。
+  \item[\code{max\_rejection\_rate} \(=0.20\)]
+    Laplace 近似ガウスの質量のうち有効台の外へ出る割合 \(r\) を 0.20 に制限すると、
+    打ち切りガウスの密度歪みは \(1/(1-r)=1.25\) 倍に抑えられる。値自体は宣言的規約。
+  \item[systematic deviation の被験者割合 \(=0.20\)]
+    正しく特定されたモデルでは約 5\% の被験者が偶然閾を超える（37名で期待 1.85名）。
+    20\% 超（8/37以上）を境界とすると公称率の4倍で、帰無仮説下の二項確率は
+    \(10^{-3}\) 未満。
+\end{description}
+
+\end{document}

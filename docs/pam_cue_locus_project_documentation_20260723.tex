@@ -1,0 +1,720 @@
+% コンパイル:
+%   lualatex pam_cue_locus_project_documentation_20260723.tex
+%   lualatex pam_cue_locus_project_documentation_20260723.tex
+% 日本語文書のため LuaLaTeX + luatexja-preset を使用する。
+\documentclass[11pt]{ltjsarticle}
+\usepackage{luatexja-preset}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{geometry}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+\usepackage{xcolor}
+\geometry{a4paper,margin=23mm}
+\setlist{leftmargin=1.5em}
+
+\newcommand{\code}[1]{\texttt{\detokenize{#1}}}
+\newcommand{\hashcode}[1]{{\scriptsize\texttt{\detokenize{#1}}}}
+\newcommand{\RoneTasks}{106}
+\newcommand{\RoneFits}{424}
+\newcommand{\RoneSnapshot}{2026年7月23日13時43分（JST）}
+\newcommand{\pass}{\textcolor{green!45!black}{通過}}
+\newcommand{\running}{\textcolor{blue!65!black}{実行中}}
+\newcommand{\pending}{\textcolor{orange!70!black}{未完了}}
+
+\title{PAM cue-locus 37名解析プロジェクト\\
+技術仕様・実装・検証状況}
+\author{PAM/TAPASに基づくPython再実装層}
+\date{文書版0.1.0（2026年7月23日）}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+本書は、37名のdot taskを対象とするPAM
+（Predictive Accumulation Models）拡張プロジェクトについて、研究目的、実験契約、
+数理モデル、Python実装、MATLAB参照照合、事前分布、回収Gate、PPC、および
+2026年7月23日時点の実行状況を一つにまとめた技術文書である。本研究の中心的な問いは、
+赤キューから得られる予測が、DDMの相対的開始点 \(w\) と
+coherence非依存drift bias \(v_0\) のどちらへ作用するモデルで、choiceとRTの
+同時分布をよりよく説明できるか、さらにその予測が履歴信念と独立にDDMへ入るのか、
+二本のcue別HGF内で共通確率表現へ統合されるのか、という二軸の比較である。
+
+現行の主要推定経路は、HGFとDDMを同一目的関数で推定する被験者別joint-MAP、
+数値HessianによるLaplace LME、37名のLMEを用いるrandom-effects Gibbs BMSである。
+HSSMによる部分プーリングやMCMCは本Gateの推定経路に含めない。実データの
+choice/RTを主要モデルへ適合する前に、実37名の試行設計とmissingness maskだけを
+用いたGate R1 model/parameter recoveryを実行している。本書に記載するR1進捗は
+計算状態の監査であり、モデル選択結果または科学的結論ではない。
+\end{abstract}
+
+\tableofcontents
+
+\section{文書の役割と規範文書}
+
+本書は現行プロジェクトの統合説明であり、凍結済みの数値契約を再定義しない。
+競合が生じた場合の優先順位は次のとおりである。
+
+\begin{enumerate}
+  \item Gate R1の凍結manifestと実行addendum
+  \item \code{docs/cue_locus_design_20260722.md}
+  \item \code{docs/cue_locus_behavioral_model_spec.md}
+  \item \code{analysis/pam_dot_task_python/}のversioned registryと実装
+  \item 本書（説明および進捗のスナップショット）
+\end{enumerate}
+
+旧PAMモデル、MATLAB fixture、および過去のparameter recoveryは回帰参照として
+保持するが、新しいcue-locusモデルのGate通過を代用しない。また本書では、
+観測されたchoice率、RT分布、実データLME、BMS順位を報告しない。
+
+\section{研究目的と主張可能範囲}
+
+\subsection{中心的な研究質問}
+
+本研究は、キューから得られる予測の行動的作用を次の二軸に分ける。
+
+\begin{description}
+  \item[入力表現]
+    \emph{parallel}では、過去の刺激履歴から得る信念と現在のキュー証拠を別々に
+    DDMへ入力する。\emph{integrated}では、白キュー用・赤キュー用の二本のHGFから
+    active cueの予測確率を得て、その単一確率だけをDDMへ入力する。
+  \item[DDM作用点]
+    刺激提示前の相対的開始点 \(w\)、または非tie試行で蓄積中に働く
+    coherence非依存drift bias \(v_0\) を主要候補とする。
+\end{description}
+
+したがって、行動モデルから主張できるのは「行動がどの計算モデルと最も整合するか」
+である。開始点モデルの勝利を特定の脳部位や神経経路の直接証明とは解釈しない。
+神経指標を伴わなくても、事前固定したmodel recoveryにより \(w\) と \(v_0\) を
+行動的に区別できることが確認されれば、計算論的な作用点比較として論文化可能である。
+
+\subsection{過去のHSSM研究との関係}
+
+別プロジェクトのHSSM/HGF\_DDM解析は、固定または外部計算したbeliefを用い、
+テスト期を三分割した時間変化やcoupling減衰を検討した。本プロジェクトはその
+科学的動機を継承するが、次の点で異なる。
+
+\begin{itemize}
+  \item HGF軌跡を固定せず、知覚パラメータとDDMパラメータをjoint-MAPで同時推定する。
+  \item 時間三分割を主要パラメータ化せず、静的な作用点
+        \(\{\text{history-only},w,v_0,w+v_0\}\) の識別を先に検査する。
+  \item HSSMの階層MCMCではなく、PAM/TAPAS型の個人MAP、Laplace LME、
+        random-effects BMSを使用する。
+  \item 過去のStage A結果は設計上の動機としてのみ用い、現行Gateの通過証拠にしない。
+\end{itemize}
+
+\section{実験およびデータ契約}
+
+\subsection{被験者と試行}
+
+対象は37名、各380試行である。読み取り専用の設計監査では、
+\code{normal}=10、\code{normal_cb}=10、\code{reverse}=7、
+\code{reverse_cb}=10であり、総試行数は14,060である。
+
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+試行 & 知覚更新 & 応答尤度 \\
+\midrule
+1--100 & HGFへ入力 & 主要DDM尤度から除外 \\
+101--380 & HGFへ入力 & 有効choice/RTを主要尤度へ入力 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+試行1--100のchoice/RTは、将来のconditional held-out・時間外挿PPCにのみ使用する。
+全380試行を応答尤度へ含める解析は別mask IDの感度分析とし、主要LME行列へ混在させない。
+反応期限およびシミュレーション格子上限は実験環境と同じ3秒に固定する。
+
+\subsection{実際のキューと境界整列}
+
+提示キューは赤い十字と白い十字の二種類であり、
+「左予測・neutral・右予測」の三水準キューではない。白キューは操作上の参照条件で、
+赤キューが学習期に特定のカテゴリと高coherenceを予測する。
+
+上側境界を白判断、下側境界を黒判断へ統一する。被験者 \(i\) について、
+赤キューが学習期に予測したカテゴリの符号を
+
+\[
+r_i=
+\begin{cases}
++1,&\text{normal または normal\_cb（赤が白を予測）},\\
+-1,&\text{reverse または reverse\_cb（赤が黒を予測）}
+\end{cases}
+\]
+
+とする。赤キュー提示を \(q_{it}=\mathbb I(\mathrm{cue}_{it}=\mathrm{red})\)
+とすると、反応境界へ整列した即時キュー証拠は
+
+\[
+\kappa_{it}=r_iq_{it}\in\{-1,0,+1\}
+\]
+
+である。0はneutral cueの提示ではなく、白キューを参照値にした符号である。
+実装では少なくとも
+\code{cue_red}、\code{red_prediction_sign}、\code{cue_evidence}、
+\code{choice_white}、\code{ratio_corrected}、\code{signed_coherence}、
+\code{is_tie}を監査列として保持する。
+
+\subsection{刺激符号とtie}
+
+\[
+x_t=2\,\mathtt{ratio\_corrected}_t-1,\qquad
+T_t=\mathbb I(x_t=0)
+\]
+
+とする。非tieでは
+
+\[
+s_t=\mathbb I(x_t>0),\qquad d_t=2s_t-1=\operatorname{sign}(x_t)
+\]
+
+である。tieは白100・黒100ドットで客観的カテゴリを持たないため、
+placeholderカテゴリを数式へ流さず、全response modelで明示的に
+\(d_t=0,\ v_t=0\) とする。この確定仕様を案Aと呼ぶ。
+
+\section{知覚モデル}
+
+\subsection{共通のeHGF}
+
+知覚層にはeffective two-level binary eHGFを用いる。概念的には
+
+\begin{align}
+x_{2,t}&\sim
+\mathcal N\!\left(x_{2,t-1},\exp(\omega_2)\right),\\
+s_t\mid x_{2,t}&\sim
+\operatorname{Bernoulli}\!\left(\sigma(x_{2,t})\right),\qquad
+\sigma(z)=\frac{1}{1+\exp(-z)}
+\end{align}
+
+であり、現行cue-locusモデルで自由な知覚パラメータは
+変換空間の \(\omega_2\) である。DDMへ渡すのは当該試行を観測する前の
+白カテゴリ予測である。tieではカテゴリ観測を与えず、
+\(\mu_{1,t}=\hat\mu_{1,t}\)、prediction errorを0として状態を保持する。
+
+\subsection{parallel表現}
+
+parallelでは、キューを入力に使わない単一のcue-blind HGFを全380試行に走らせる。
+観測前の履歴予測を
+
+\[
+h_t=P(s_t=1\mid s_{<t})
+\]
+
+とする。\(h_t\) と現在の \(\kappa_t\) は異なる入力としてDDMへ渡す。
+
+\subsection{integrated表現（案D）}
+
+integratedでは白キュー用と赤キュー用の二本のeHGFを外部カスタムperceptual model
+内で実行する。二本は状態を別々に持つが、\(\omega_2\) を含むHGFパラメータを共有する。
+提示されていないcue系列は更新せず、各系列はcue提示回数を局所時間軸とする。
+active cueの観測前予測
+
+\[
+m_t=P(s_t=1\mid \mathrm{cue}_t,\ 
+      \text{同じcueの過去履歴})
+\]
+
+だけをDDMへ渡し、raw \(\kappa_t\) をDDMへ重ねない。従ってintegratedでは、
+cueと履歴が知覚層ですでに共通確率表現へ統合されている。
+
+\section{DDM定式化}
+
+\subsection{共通部分}
+
+主要作用点比較では境界変調を固定し、
+
+\[
+a_t=a_a,\qquad Ter_t=Ter
+\]
+
+とする。非tieの感覚証拠を
+
+\[
+v_{\mathrm{sens},t}=d_t\{a_v+b_c|x_t|\}
+\]
+
+と定義する。ここで \(a_a>0\) は境界幅、\(a_v>0\) は基準drift magnitude、
+\(b_c\) はcoherence主効果である。非決定時間は
+
+\[
+0<Ter<\min(RT_{\mathrm{valid}})
+\]
+
+を満たすよう、変換空間の \(\theta_{Ter}\) から
+\[
+Ter=\min(RT_{\mathrm{valid}})\sigma(\theta_{Ter})
+\]
+とする。
+
+\subsection{parallelの作用点}
+
+履歴だけの開始点を
+
+\[
+w^{(H)}_t=0.5+b_{H,w}(h_t-0.5)
+\]
+
+とする。開始点への直接キュー作用を許す場合、
+
+\[
+w_t=
+\sigma\!\left[
+\operatorname{logit}\{w^{(H)}_t\}+\gamma_w\kappa_t
+\right]
+\]
+
+とする。これにより \(0<w_t<1\) が保証され、
+\(\gamma_w=0\) でhistory-onlyへ厳密に戻る。
+
+非tieのdriftは
+
+\[
+v_t=d_t\{a_v+b_c|x_t|\}+\gamma_{v0}\kappa_t .
+\]
+
+\(\gamma_{v0}\) はcoherenceの大きさによらない加算的drift biasである。
+tieでは上式を使わず \(v_t=0\) とする。
+
+\subsection{integratedの作用点}
+
+開始点は
+
+\[
+w_t=0.5+b_w(m_t-0.5)
+\]
+
+とする。非tieのdriftは
+
+\[
+v_t=d_t\{a_v+b_c|x_t|\}+b_v(m_t-0.5)
+\]
+
+である。\(b_w\) は統合beliefから開始点への傾き、
+\(b_v\) は統合beliefからcoherence非依存drift biasへの傾きである。
+tieではparallelと同様に \(v_t=0\) とし、\(w_t\) は \(m_t\) から通常どおり計算する。
+
+\subsection{tieによる識別}
+
+案Aではすべての候補でtieのdriftが0である。このため、
+
+\begin{itemize}
+  \item \(w\) 作用モデルはtieでもcue別choice差を生成しうる。
+  \item \(v_0\) 作用だけのモデルはtieでcue別choice差を生成できない。
+  \item 非tieでは、開始点とdriftがchoiceとRT分布へ及ぼす異なる形状を利用する。
+\end{itemize}
+
+この識別力は \(v_{\mathrm{tie}}=0\) という理論仮定に条件づく。
+将来tie driftを許す場合は、別formulation versionと独立recovery Gateが必要である。
+
+\section{候補モデル}
+
+Gate R1ではarchitectureごとに四候補を比較する。
+
+\begin{longtable}{p{0.30\linewidth}p{0.12\linewidth}p{0.18\linewidth}p{0.26\linewidth}}
+\toprule
+model ID & architecture & 自由な作用 & 解釈 \\
+\midrule
+\endhead
+\code{cue_history_w} & history & \(b_{H,w}\) &
+cue-blind履歴による開始点。両architectureで共有するbaseline。\\
+\code{cue_parallel_w} & parallel & \(b_{H,w},\gamma_w\) &
+履歴開始点に加え、現在cueが開始点へ直接作用。\\
+\code{cue_parallel_vbias} & parallel & \(b_{H,w},\gamma_{v0}\) &
+現在cueが非tie driftへ直接作用。\\
+\code{cue_parallel_w_vbias} & parallel &
+\(b_{H,w},\gamma_w,\gamma_{v0}\) & 開始点とdrift biasの両方。\\
+\code{cue_integrated_w} & integrated & \(b_w\) &
+二本のHGFによる統合beliefが開始点へ作用。\\
+\code{cue_integrated_vbias} & integrated & \(b_v\) &
+統合beliefが非tie drift biasへ作用。\\
+\code{cue_integrated_w_vbias} & integrated & \(b_w,b_v\) &
+統合beliefが開始点とdrift biasの両方へ作用。\\
+\bottomrule
+\end{longtable}
+
+coherence依存gainである \(\gamma_{vg}\) と \(b_g\) は科学的候補として仕様化されているが、
+主要二作用点のR1通過後にのみGate R3で追加する。初期R1へ入れない。
+
+\section{パラメータ変換とcandidate prior}
+
+正値パラメータは
+
+\[
+a_a=\exp(\theta_{a_a}),\qquad
+a_v=\exp(\theta_{a_v})
+\]
+
+と変換する。開始点傾き \(b_{H,w}\) とintegratedの \(b_w\) は
+\((-1,1)\) に写像し、\(\gamma_w,\gamma_{v0},b_v,b_c\) は変換空間で無制約とする。
+
+cue作用priorは、観測choice/RTを用いず、実37名のtrial順、cue、coherence、
+condition、missingness maskに対するprior predictive simulationで較正した。
+cue-consistent choice確率差を弱0.005、中0.015、強0.025と定義する。
+
+\begin{center}
+\begin{tabular}{lrrr}
+\toprule
+係数（変換空間） & 弱 & 中 & 強 \\
+\midrule
+\(\gamma_w\) & 0.020001 & 0.060018 & 0.100083 \\
+\(\gamma_{v0}\) & 0.025431 & 0.076305 & 0.127215 \\
+\(b_w\)（integrated） & 0.328454 & 1.067649 & 2.276546 \\
+\(b_v\)（integrated） & 0.730925 & 2.202855 & 3.750562 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+強効果値が対称Normal priorの中央95\%端に対応するよう、各cue係数のprior SDを
+決めている。prior predictive監査では全8監査セルで数値失敗0、開始点の極端な
+張り付き0、3秒captured mass約1を確認した。ただしpriorのstatusは
+\code{candidate_not_frozen}であり、model recoveryとprior順位感度が終わるまで
+実データ本解析用priorとして凍結しない。
+
+\section{推定、モデル証拠、集団比較}
+
+\subsection{joint-MAP}
+
+被験者 \(i\) の自由パラメータを
+\(\boldsymbol\theta_i=(\theta_{\mathrm{HGF},i},
+\theta_{\mathrm{DDM},i})\) とする。主要応答尤度の有効試行集合を
+\(\mathcal V_i\subseteq\{101,\ldots,380\}\) とし、WFPT密度を
+\(f_{\mathrm{WFPT}}\) とすると、
+
+\[
+\begin{aligned}
+\widehat{\boldsymbol\theta}_{i,\mathrm{MAP}}
+&=\arg\min_{\boldsymbol\theta_i}
+\Biggl[
+-\sum_{t\in\mathcal V_i}
+\log f_{\mathrm{WFPT}}
+\bigl\{y_{it},RT_{it}-Ter_i
+\mid w_{it},a_{it},v_{it}\bigr\}\\
+&\qquad
+-\log p(\theta_{\mathrm{HGF},i})
+-\log p(\theta_{\mathrm{DDM},i})
+\Biggr].
+\end{aligned}
+\]
+
+HGFを先に適合して固定する二段階推定ではない。目的関数を評価するたびにHGF予測と
+DDM trialwise量を同じパラメータから構築する。
+
+\subsection{数値経路}
+
+主要経路はTAPAS 6.1.0に基づくRidders有限差分とreset可能BFGSである。
+各被験者・モデルについて、prior平均と、prior SDの0.25倍だけ対称にずらした
+二つの初期値、合計3初期値を実行し、有限な最小negative log jointを採用する。
+最良MAP点で数値Hessianを計算し、
+
+\[
+\log p(y_i\mid M)
+\approx
+\log p(y_i,\widehat{\boldsymbol\theta}_i\mid M)
+-\frac{1}{2}\log|H_i|
+-\frac{k_i}{2}\log(2\pi)
+\]
+
+としてLaplace LMEを得る。Hessianが非有限または非正定値なら、
+BFGS inverse-Hessianを明示的fallbackとして使用し、その事実を保存する。
+
+この個人推定はMCMCではない。MCMCに相当する反復サンプリングは、
+37名のLMEが揃った後にmodel frequencyを推定する
+SPM型random-effects Gibbs BMSだけである。
+
+\subsection{集団BMS}
+
+各生成反復について37名全員の有限LMEが揃った場合にのみ、
+architecture内四候補へGibbs BMSを実行する。主要出力はmodel expected frequencyと
+exceedance probabilityである。protected BMSは感度分析として区別し、
+欠損LMEを補完しない。
+
+\section{Python実装とMATLAB参照}
+
+\subsection{主要モジュール}
+
+\begin{longtable}{p{0.28\linewidth}p{0.64\linewidth}}
+\toprule
+モジュール & 役割 \\
+\midrule
+\endhead
+\code{data.py} & 37名CSV、condition、counterbalance、likelihood mask、監査列。\\
+\code{hgf.py} & single-streamおよび二本のcue別eHGF、tie恒等更新。\\
+\code{response.py} & trialwise \(w,a,v,Ter\)、WFPT尤度、cue-locus式。\\
+\code{config.py} & model registry、自由パラメータ、candidate prior、digest。\\
+\code{objective.py} & joint negative log posterior、MAP、Ter診断、HGFキャッシュ。\\
+\code{numerics.py} & Ridders勾配/Hessian、BFGS、Laplace LME。\\
+\code{recovery.py} & 生成・再推定、Ter変換補正、parameter recovery。\\
+\code{cue_r1.py} & R1セル、truth、三初期値fit、BMS、manifest契約。\\
+\code{bms.py} & SPM型Gibbs BMSとprotected BMS感度。\\
+\code{ppc.py} & 3秒DDM simulation、集約PPC、逐次PPC。\\
+\code{run_cue_r1.py} & R1 freeze/run/resume/summarize、原子的タスク保存。\\
+\bottomrule
+\end{longtable}
+
+\subsection{数値parity}
+
+Python実装はPAM/TAPAS/SPM12を無条件に公式実装と称するものではなく、
+GPLの独立再実装である。MATLAB Online fixtureにより、少なくとも次を照合済みである。
+
+\begin{itemize}
+  \item single-streamおよび二本のcue別HGF全軌跡
+  \item WFPT 2,240点
+  \item 公式およびcoherence拡張DDMのtrial likelihood
+  \item joint objective、局所MAP、Ridders Hessian、Laplace LME
+  \item Gibbs/protected BMS
+  \item 3秒期限simulation、集約PPC、逐次PPC
+\end{itemize}
+
+旧MATLAB fixtureは旧モデルの回帰テストとして保持する。新cue-locus式の正当性は、
+解析的テスト、zero-effect nesting、simulation-likelihood整合、
+model/parameter recoveryで判定する。現行Pythonテストは179件で全通過している。
+
+\section{PPC}
+
+実データ本解析では、各被験者・モデルについて試行indexを保持した事後予測バッチを
+一度だけ生成し、同じバッチを集約PPCと逐次PPCへ再利用する。窓ごとに新しい標本を
+生成しない。
+
+\begin{itemize}
+  \item cue \(\times\) signed coherence別choice率
+  \item RTのq10、q50、q90とchoice-conditional RT
+  \item 符号整列したtie choiceコントラスト
+  \item test試行位置別およびcue提示順別の時間分解統計
+  \item 試行1--100のconditional held-out PPC
+\end{itemize}
+
+一度の事後予測生成でも、試行位置を保持し、事前固定した窓ごとに統計量を計算すれば
+時間分解PPCとなる。現行実装は49個の逐次窓を全37名で構築できる。
+3秒までのWFPT massを \code{captured_mass} として保存し、RT/choice PPCは
+有効な期限内反応に条件づける。
+
+\section{回収Gate}
+
+\subsection{Gate R0}
+
+Gate R0は数式と配線の検査である。cue符号、境界、counterbalance、tieの \(v=0\)、
+zero-effect nesting、trialwise simulation/likelihood一致、HGF更新1--380、
+応答mask 101--380、model IDと自由パラメータ集合を解析的テストで確認する。
+現行実装とテスト上は\pass である。
+
+\subsection{Gate R1}
+
+R1はparallelとintegratedを別々に四候補で回収し、各表現内で
+history-only、\(w\)、\(v_0\)、\(w+v_0\) を区別できるか検査する。
+
+\begin{itemize}
+  \item 2 architecture
+  \item architectureごとにnull 1セルと、
+        \(w,v_0,w+v_0\) の弱・中・強9セル：計20セル
+  \item 各セル20反復、各反復37名
+  \item 各被験者でarchitecture内4候補、各候補3初期値
+  \item HGF更新1--380、応答尤度101--380、3秒期限
+  \item \(\omega_2\)、Ter、基準drift、coherence slopeを含むtruth変動
+\end{itemize}
+
+中・強効果とnullからなる14セルが主要Gateで、弱効果6セルは検出力記述である。
+全20セルでは59,200 LME、177,600 MAP最適化を事前宣言している。
+
+\subsection{R1成功基準}
+
+\begin{itemize}
+  \item 中・強効果でgenerating locusが最大expected frequency：
+        反復の80\%以上
+  \item null生成時のcue作用偽陽性率：10\%以下
+  \item \(w\rightarrow v_0\)、\(v_0\rightarrow w\) 誤分類率：各10\%以下
+  \item \(w+v_0\) が単一作用点へ縮退する割合を独立報告
+  \item parameter recovery：
+        \(r\ge0.70\)、絶対bias \(\le0.50\)、
+        RMSE/prior SD \(\le1.0\)、各20ケース以上
+\end{itemize}
+
+R1不通過なら実データで \(w\) 対 \(v_0\) を主張しない。
+一方のarchitectureだけが通過した場合は、そのarchitecture内の作用点だけを
+主張可能とし、parallel対integratedの優劣を主張しない。
+
+\subsection{Gate R2とR3}
+
+R1で両architectureが作用点を回収できた場合に限り、R2でparallelとintegratedを
+同一候補集合へ入れ、architecture \(\times\) locus混同行列を作る。
+R3はR1後の別manifestでcoherence依存gainを検査する。
+
+\section{Gate R1の凍結物と現在状態}
+
+\subsection{凍結digest}
+
+\begin{longtable}{p{0.33\linewidth}p{0.57\linewidth}}
+\toprule
+対象 & SHA-256 \\
+\midrule
+\endhead
+cue prior candidate manifest &
+\hashcode{6fdb83255578d369cd45a229b321366b433a956f94c08e0bd7126ff596121dc3}\\
+design &
+\hashcode{9a326c820b03d5829ceb7dbd075248896ed6cb77db5fe72c46083c5cade76a28}\\
+model registry &
+\hashcode{9a36a0860bb7c5c36407bcc7a1f7d756bf228ead32da22c88e1660e99188a3ee}\\
+Gate R1 manifest &
+\hashcode{521307cb271248e3c2ad8d73576d9585f7c10c9d1128d8a31127d1756dd05f02}\\
+HGF-cache execution addendum &
+\hashcode{d86c55b3db3c4198eb5756afc3d43c9324c3d2063639383a1c222d19d40b6d61}\\
+\bottomrule
+\end{longtable}
+
+manifestは生成前に凍結済みであり、観測choice/RT値を効果較正またはtruth生成へ
+使用していない。
+
+\subsection{決定論的HGFキャッシュ}
+
+Ridders法はDDMパラメータだけを摂動した評価でも同じHGF軌跡を再計算していた。
+HGFは同じ試行入力と同じ自由HGFパラメータに対して決定論的であるため、
+自由HGFパラメータの完全一致tupleをkeyとする容量256のLRUキャッシュを導入した。
+\(\omega_2\) が変われば必ず再計算し、HGFを固定パラメータ化しない。
+
+採用前ベンチマークでは次を確認した。
+
+\begin{center}
+\begin{tabular}{lrrr}
+\toprule
+対象 & cacheなし & cacheあり & 高速化 \\
+\midrule
+parallel勾配 & 2.09秒 & 1.79秒 & 1.17倍 \\
+integrated勾配 & 2.01秒 & 1.44秒 & 1.40倍 \\
+integrated正式Hessian & 15.92秒 & 5.28秒 & 3.01倍 \\
+短縮MAP+Laplace & 10.94秒 & 3.92秒 & 2.79倍 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+目的関数、勾配、MAP引数、negative log joint、Hessian、LMEの最大差はすべて0であった。
+実行最適化は科学モデル、optimizer、seed、prior、成功基準を変更しない。
+既存のcacheなし81タスクを再利用できることをaddendumで事前固定し、
+以降のタスクにはaddendum digest、cache容量、hit/miss診断を保存する。
+
+\subsection{進捗スナップショット}
+
+\RoneSnapshot 時点で、主要R1は\running である。
+
+\begin{center}
+\begin{tabular}{lr}
+\toprule
+量 & 状態 \\
+\midrule
+完了subject tasks & \RoneTasks{} / 10,360 \\
+完了candidate fits & \RoneFits{} / 41,440 \\
+有限・成功fit & \RoneFits{} / \RoneFits{} \\
+完全な37名反復 & 2 \\
+現在の生成セル & \code{parallel__null__zero} \\
+Gate判定 & \code{not_evaluable} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+この進捗はファイル生成状況の監査であり、null偽陽性率や作用点回収率の結論ではない。
+主要14セルの各20反復が完了するまでGateを通過・不通過へ分類しない。
+現在の実行はHGFキャッシュ有効・1並列で再開されている。
+
+\section{再現可能性と実行方法}
+
+\subsection{テスト}
+
+\begin{verbatim}
+cd analysis/pam_dot_task_python
+PYTHONPATH=src python3 -B -m unittest discover \
+  -s tests -p 'test_*.py'
+\end{verbatim}
+
+本書作成時点では179件が通過している。
+
+\subsection{R1の再開}
+
+\begin{verbatim}
+cd analysis/pam_dot_task_python
+PYTHONPATH=src python3 -B scripts/run_cue_r1.py run \
+  /path/to/dot_task/analysis/real_data \
+  recovery_runs/cue_r1_0_1_0 \
+  --phase primary --workers 1 --hgf-cache-size 256
+\end{verbatim}
+
+各subject taskは一時ファイルへ書いた後にatomic renameされる。既存JSONを検出して
+自動的にスキップするため、中断後も完了済みタスクから再開できる。
+4並列を使う場合はOSのprocess semaphore許可が必要であり、外側のsubject-task並列と
+内側のRidders並列を同時に増やしてoversubscriptionを起こさない。
+
+\subsection{主要成果物}
+
+\begin{itemize}
+  \item \path{analysis/pam_dot_task_python/recovery_runs/cue_r1_0_1_0/manifest.json}
+  \item \path{analysis/pam_dot_task_python/recovery_runs/cue_r1_0_1_0/execution_addendum_hgf_cache_0.1.0.json}
+  \item \path{analysis/pam_dot_task_python/recovery_runs/cue_r1_0_1_0/hgf_cache_benchmark.json}
+  \item \path{analysis/pam_dot_task_python/recovery_runs/cue_r1_0_1_0/tasks/}
+  \item \path{analysis/pam_dot_task_python/recovery_runs/cue_r1_0_1_0/summary.json}
+\end{itemize}
+
+\section{停止規則、限界、次の作業}
+
+\subsection{停止規則}
+
+\begin{itemize}
+  \item R1で作用点を回収できなければ、実データで \(w\) 対 \(v_0\) を主張しない。
+  \item R1は通るがR2が通らなければ、作用点だけを主張し、入力表現を区別しない。
+  \item gainが回収できなければ、gainを主要結論へ含めない。
+  \item 数値失敗または欠損LMEが候補間で偏れば、補完せず原因解消までBMSへ進まない。
+  \item Gate完了後に閾値、prior、候補集合、効果量を緩和しない。
+\end{itemize}
+
+\subsection{現時点の限界}
+
+\begin{itemize}
+  \item priorはcandidateであり、R1とprior-rank感度が未完了である。
+  \item R1は実行中で、作用点識別可能性はまだ判定できない。
+  \item R2、R3、実データ37名fit、集約・逐次PPCはR1の結果に依存する。
+  \item 行動モデル比較は神経機構の直接証明ではない。
+  \item tieによる識別は \(v_{\mathrm{tie}}=0\) という案Aに条件づく。
+  \item 現行PAM経路は部分プーリングを含まず、個人差パラメータが弱識別な場合がある。
+\end{itemize}
+
+\subsection{次の作業順序}
+
+\begin{enumerate}
+  \item Gate R1主要14セルを完了し、正式BMSとparameter recoveryを集計する。
+  \item 弱効果6セルを検出力記述として完了する。
+  \item R1通過範囲に応じてR2 architecture recoveryを実行する。
+  \item 凍結後の符号整列tie記述診断を作成する。
+  \item 3--5名の非報告スモークfitと集約・逐次PPCで配線を確認する。
+  \item Gateが許すモデル集合だけを37名実データ本解析へ適用する。
+  \item 必要な場合に限り、別manifestでR3 gain感度を実行する。
+\end{enumerate}
+
+\section{記号一覧}
+
+\begin{longtable}{p{0.18\linewidth}p{0.72\linewidth}}
+\toprule
+記号 & 意味 \\
+\midrule
+\endhead
+\(x_t\) & signed coherence（白優位が正、黒優位が負）\\
+\(T_t\) & tie indicator\\
+\(s_t\) & 非tieの刺激カテゴリ（白優位1、黒優位0）\\
+\(d_t\) & 非tieのdrift方向、tieでは0\\
+\(q_t\) & 赤キュー提示indicator\\
+\(r_i\) & 赤キューが予測する反応境界の被験者別符号\\
+\(\kappa_{it}\) & 境界整列した即時キュー証拠 \(r_iq_{it}\)\\
+\(h_t\) & cue-blind履歴HGFの観測前予測\\
+\(m_t\) & 二本のcue別HGFにおけるactive cue観測前予測\\
+\(\omega_2\) & HGF状態変化分散を支配する自由知覚パラメータ\\
+\(w_t\) & DDMの相対的開始点\\
+\(a_t\) & DDM境界幅\\
+\(v_t\) & DDM drift rate\\
+\(Ter\) & 非決定時間\\
+\(b_c\) & coherence magnitudeの共通drift slope\\
+\(\gamma_w\) & parallelのcue-to-starting-point作用\\
+\(\gamma_{v0}\) & parallelのcue-to-drift-bias作用\\
+\(b_w\) & integrated belief-to-starting-point作用\\
+\(b_v\) & integrated belief-to-drift-bias作用\\
+\bottomrule
+\end{longtable}
+
+\end{document}

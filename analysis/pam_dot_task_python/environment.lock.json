@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-07-20",
+  "python": "3.9.6",
+  "packages": {
+    "numpy": "2.0.2",
+    "scipy": "1.13.1",
+    "pandas": "2.3.3"
+  },
+  "source_parity": {
+    "pam_commit": "ce8be02b45edf0a0a4e52d4298fbfefb5c5b6294",
+    "tapas_commit": "7155f99137c5e03f93a2a3afa6a8cb54c75dd4c2",
+    "spm12_commit": "3085dac00ac804adb190a7e82c6ef11866c8af02"
+  }
+}
+

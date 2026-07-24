@@ -1,0 +1,265 @@
+{
+  "frozen_before_inspecting_ppc_results": true,
+  "frozen_on": "2026-07-21",
+  "gate_ppc": {
+    "declaration": {
+      "aggregate_spec_version": "aggregate-1.0.0",
+      "aggregate_window_count": 7,
+      "decision_time_step": 0.001,
+      "global_discrepancy": "max_absolute_standardized_deviation",
+      "max_condition_number": 100000000.0,
+      "max_rejection_rate": 0.2,
+      "min_valid_trials": 5,
+      "point_interval": [
+        0.025,
+        0.975
+      ],
+      "record_hessian_relative_error": true,
+      "reject_bfgs_fallback_hessian": true,
+      "replicates": 2000,
+      "require_positive_definite_numerical_hessian": true,
+      "response_deadline_seconds": 3.0,
+      "rng_algorithm": "MT19937",
+      "sequential_spec_version": "1.0.0",
+      "sequential_window_count": 49,
+      "simulation_seed": 20260720,
+      "simultaneous_level": 0.95,
+      "standardization": "center_predictive_median_scale_predictive_sd",
+      "statistics": [
+        "choice_rate",
+        "accuracy",
+        "rt_q10",
+        "rt_q50",
+        "rt_q90",
+        "rt_choice0_q50",
+        "rt_choice1_q50"
+      ],
+      "systematic_deviation_subject_fraction": 0.2,
+      "systematic_deviation_window_family": "test_coherence",
+      "tail_probability_definition": "two_sided_2x_min_percentile",
+      "version": "gate-ppc-1.0.0"
+    },
+    "digest": "a81d08fc024e7afddb13c95725749a4fdaeaf3e49dc97e4639a011c9388bca87"
+  },
+  "note": "RECOVERY_GRID_V2 relocates omega_2 to the Bayes-optimal operating range; V1 superseded (see gates.py).",
+  "recovery_criteria": {
+    "declaration": {
+      "max_absolute_bias": 0.5,
+      "max_rmse_over_prior_sd": 1.0,
+      "min_cases_per_parameter": 20,
+      "min_correlation": 0.7,
+      "version": "recovery-criteria-1.0.0"
+    },
+    "digest": "f9336c2218a5c6a1a3fac0db31b60b80cae194fa94f2a8c8c6e75e2fa17b3c83"
+  },
+  "recovery_grid": {
+    "declaration": {
+      "model_id": "ddm_v",
+      "parameter_names": [
+        "hgf.omega_2",
+        "ddm.log_a_a",
+        "ddm.log_a_v",
+        "ddm.b_v",
+        "ddm.Ter_logit"
+      ],
+      "seeds": [
+        20260751,
+        20260752,
+        20260753,
+        20260754,
+        20260755,
+        20260756,
+        20260757,
+        20260758,
+        20260759,
+        20260760,
+        20260761,
+        20260762,
+        20260763,
+        20260764,
+        20260765,
+        20260766,
+        20260767,
+        20260768,
+        20260769,
+        20260770,
+        20260771,
+        20260772,
+        20260773,
+        20260774
+      ],
+      "truths": [
+        [
+          -5.6,
+          0.6,
+          0.2,
+          -2.0,
+          2.0
+        ],
+        [
+          -5.6,
+          0.4,
+          0.4,
+          -1.2,
+          1.8
+        ],
+        [
+          -5.6,
+          0.4,
+          0.0,
+          1.2,
+          1.6
+        ],
+        [
+          -5.6,
+          0.6,
+          0.0,
+          2.0,
+          2.0
+        ],
+        [
+          -5.1,
+          0.8,
+          0.2,
+          -2.0,
+          1.8
+        ],
+        [
+          -5.1,
+          0.8,
+          0.4,
+          -1.2,
+          1.6
+        ],
+        [
+          -5.1,
+          0.8,
+          0.2,
+          1.2,
+          1.6
+        ],
+        [
+          -5.1,
+          0.6,
+          0.4,
+          2.0,
+          1.6
+        ],
+        [
+          -4.6,
+          0.8,
+          0.0,
+          -2.0,
+          1.8
+        ],
+        [
+          -4.6,
+          0.4,
+          0.0,
+          -1.2,
+          1.6
+        ],
+        [
+          -4.6,
+          0.4,
+          0.4,
+          1.2,
+          2.0
+        ],
+        [
+          -4.6,
+          0.4,
+          0.2,
+          2.0,
+          1.8
+        ],
+        [
+          -4.1,
+          0.8,
+          0.2,
+          -2.0,
+          2.0
+        ],
+        [
+          -4.1,
+          0.6,
+          0.4,
+          -1.2,
+          1.8
+        ],
+        [
+          -4.1,
+          0.8,
+          0.0,
+          1.2,
+          2.0
+        ],
+        [
+          -4.1,
+          0.8,
+          0.0,
+          2.0,
+          1.8
+        ],
+        [
+          -3.6,
+          0.4,
+          0.0,
+          -2.0,
+          2.0
+        ],
+        [
+          -3.6,
+          0.6,
+          0.0,
+          -1.2,
+          1.6
+        ],
+        [
+          -3.6,
+          0.4,
+          0.2,
+          1.2,
+          2.0
+        ],
+        [
+          -3.6,
+          0.8,
+          0.4,
+          2.0,
+          2.0
+        ],
+        [
+          -3.1,
+          0.4,
+          0.4,
+          -2.0,
+          1.8
+        ],
+        [
+          -3.1,
+          0.6,
+          0.2,
+          -1.2,
+          1.6
+        ],
+        [
+          -3.1,
+          0.6,
+          0.2,
+          1.2,
+          1.8
+        ],
+        [
+          -3.1,
+          0.6,
+          0.4,
+          2.0,
+          1.6
+        ]
+      ],
+      "version": "recovery-grid-ddm_v-2.0.0"
+    },
+    "digest": "745fca209349836f75a612e9d73994f167d35b8fcf5c00d77a6d78087444324a"
+  }
+}
